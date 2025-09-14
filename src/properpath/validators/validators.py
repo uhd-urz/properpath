@@ -3,7 +3,7 @@ import string
 from pathlib import Path
 from random import choices
 from types import NoneType
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional, Self, Union
 
 from ..properpath import ProperPath
 from .base import ValidationError, Validator
@@ -17,15 +17,15 @@ class PathValidationError(ValidationError):
         # instead of being a class attribute.
         # This will ensure broad use of errno with PathValidationError in the future.
 
-    def __call__(self, *args):
+    def __call__(self, *args) -> Self:
         super().__init__(*args)
         return self
 
 
-class PathValidator(Validator):
+class PathWriteValidator(Validator):
     def __init__(
         self,
-        path: Union[Iterable, Union[str, ProperPath, Path]],
+        path: Union[Iterable[str | ProperPath | Path], Union[str, ProperPath, Path]],
         retain_created_file: bool = True,
         err_logger: Optional[logging.Logger] = None,
     ):
@@ -38,7 +38,7 @@ class PathValidator(Validator):
         self.__self_created_files: list = []
 
     @property
-    def path(self):
+    def path(self) -> Iterable[str | ProperPath | Path]:
         return self._path
 
     @path.setter
@@ -59,7 +59,7 @@ class PathValidator(Validator):
     def _self_created_files(self):
         return self.__self_created_files
 
-    def validate(self) -> Path:
+    def validate(self) -> ProperPath:
         errno: Optional[int] = None
         _self_created_file: bool = False
         for p in self.path:
@@ -99,7 +99,7 @@ class PathValidator(Validator):
                 continue
             else:
                 if p.kind == "dir":
-                    p_child.remove()
+                    p_child.remove(verbose=False)
                 if (
                     not self.retain_created_file
                     and _self_created_file
