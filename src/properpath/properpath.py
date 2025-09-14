@@ -1,5 +1,6 @@
 import logging
 import sys
+from copy import deepcopy
 from pathlib import Path
 from shutil import rmtree
 from typing import Optional, Self, Union
@@ -15,7 +16,7 @@ class ProperPath(Path):
 
     def __init__(
         self,
-        actual: Union[str, Path, "ProperPath"],
+        *actual: Union[str, Path, "ProperPath"],
         kind: Optional[str] = None,  # Here, None => Undefined/unknown
         err_logger: Optional[logging.Logger] = None,
     ):
@@ -52,7 +53,7 @@ class ProperPath(Path):
         return dirs
 
     def __str__(self):
-        return super().__str__()
+        return str(self._expanded)
 
     def __repr__(self):
         return (
@@ -63,6 +64,12 @@ class ProperPath(Path):
 
     def __hash__(self):
         return super().__hash__()
+
+    def __deepcopy__(self, memo):
+        memo[id(self)] = result = type(self).__new__(type(self))
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
     def __eq__(self, to):
         return super().__eq__(to)
@@ -76,10 +83,18 @@ class ProperPath(Path):
 
     @actual.setter
     def actual(self, value) -> None:
-        if isinstance(
-            value, ProperPath
-        ):  # We want to be able to pass a ProperPath() to ProperPath()
-            value = value.actual
+        segments = []
+        for segment in value:
+            if isinstance(
+                segment, ProperPath
+            ):  # We want to be able to pass a ProperPath() to ProperPath()
+                value = segment.actual
+            if isinstance(value, Path):
+                value = str(segment)
+                # If this isn't handled this way for Path instances,
+                # weird issues like "AttributeError: object has
+                # no attribute '_raw_paths'. Did you mean: '_raw_path'?" can happen.
+            segments.append(value)
         self._actual = value
 
     @property
@@ -116,7 +131,7 @@ class ProperPath(Path):
 
     @property
     def _expanded(self) -> Path:
-        return Path(self.actual).expanduser()
+        return Path(*self.actual).expanduser()
 
     @_expanded.setter
     def _expanded(self, value) -> None:
@@ -146,7 +161,7 @@ class ProperPath(Path):
                     self._kind = "dir"
                 case _:
                     raise ValueError(
-                        "Invalid value for parameter 'kind'. The following values "
+                        f"Invalid value '{value}' for parameter 'kind'. The following values "
                         "for 'kind' are allowed: file, dir."
                     )
 
@@ -229,7 +244,7 @@ class ProperPath(Path):
             self.PathException = permission_exception
             raise e
         if verbose:
-            self.err_logger.info(f"Deleted: {file}")
+            self.err_logger.debug(f"Removed file: {file}")
 
     def remove(self, parent_only: bool = False, verbose: bool = True) -> None:
         # removes everything (if parent_only is False) found inside a ProperPath except the parent directory of the path
