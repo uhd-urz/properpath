@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 
 [[package]]
 name = "platformdirs"
@@ -14,10 +14,10 @@ wheels = [
 [[package]]
 name = "properpath"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "platformdirs" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "platformdirs", specifier = ">=4.4.0" }]
+requires-dist = [{ name = "platformdirs", specifier = ">=4.4.0,<4.5.0" }]

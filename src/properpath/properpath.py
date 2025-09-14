@@ -4,8 +4,6 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Optional, Self, Union
 
-from platformdirs import PlatformDirs
-
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
 
 
@@ -28,8 +26,10 @@ class ProperPath(Path):
         self.PathException = NoException
 
     @classmethod
-    def platformdirs(cls, *args, follow_unix: bool = False, **kwargs) -> PlatformDirs:
-        dirs: PlatformDirs
+    def platformdirs(
+        cls, *args, follow_unix: bool = False, **kwargs
+    ) -> ProperPlatformDirs:
+        dirs: ProperPlatformDirs | ProperUnix
         if follow_unix is True:
             if sys.platform == "darwin":
                 dirs = ProperUnix(
@@ -57,8 +57,12 @@ class ProperPath(Path):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}(path={self}, actual={self.actual}, "
-            f"kind={self.kind}, err_logger={self.err_logger})"
+            f"kind={self.kind}, exists={self.exists()}, "
+            f"err_logger={self.err_logger})"
         )
+
+    def __hash__(self):
+        return super().__hash__()
 
     def __eq__(self, to):
         return super().__eq__(to)
@@ -76,8 +80,6 @@ class ProperPath(Path):
             value, ProperPath
         ):  # We want to be able to pass a ProperPath() to ProperPath()
             value = value.actual
-        if value == "":
-            raise ValueError("Path cannot be an empty string!")
         self._actual = value
 
     @property
@@ -200,7 +202,7 @@ class ProperPath(Path):
             raise os_err
 
     def _remove_file(
-        self, _file: Union[Path, Self, None] = None, verbose: bool = False
+        self, _file: Union[Path, Self, None] = None, verbose: bool = True
     ) -> None:
         file = _file or self._expanded
         if not isinstance(file, Path):
@@ -229,7 +231,7 @@ class ProperPath(Path):
         if verbose:
             self.err_logger.info(f"Deleted: {file}")
 
-    def remove(self, parent_only: bool = False, verbose: bool = False) -> None:
+    def remove(self, parent_only: bool = False, verbose: bool = True) -> None:
         # removes everything (if parent_only is False) found inside a ProperPath except the parent directory of the path
         # if the ProperPath isn't a directory, then it just removes the file
         if self.kind == "file":
@@ -244,7 +246,7 @@ class ProperPath(Path):
                         # a dir path was passed when its kind is set as "file"
                     case "dir":
                         rmtree(ref)
-                        self.err_logger.info(
+                        self.err_logger.debug(
                             f"Deleted directory (recursively): {ref}"
                         ) if verbose else ...
                         # rmtree deletes files and directories recursively.
@@ -253,13 +255,17 @@ class ProperPath(Path):
                         # traceback message. I.e., which file or directory exactly
 
     def open(self, mode="r", encoding=None, *args):
+        file = super().resolve()
         try:
-            return Path(super().resolve()).open(
+            return Path(file).open(
                 mode=mode,
                 encoding=encoding,
                 *args,
             )
         except OSError as e:
-            self.err_logger.warning(f"{e!r}")
+            self.err_logger.warning(
+                f"Could not open file {self._error_helper_compare_path_source(self.actual, file)}. "
+                f"Exception: {e!r}"
+            )
             self.PathException = e
             raise e
