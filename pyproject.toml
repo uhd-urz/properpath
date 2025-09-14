@@ -1,8 +1,22 @@
 [project]
 name = "properpath"
 version = "0.1.0"
-description = "Add your description here"
+authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
+maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
+
+description = "An extended Python pathlib.Path"
 requires-python = ">=3.13"
 dependencies = [
     "platformdirs>=4.4.0,<4.5.0",
 ]
+license = "AGPL-3.0-only"
+keywords = [
+    "path",
+]
+[tool.uv.build-backend]
+module-name = "properpath"
+module-root = "src"
+
+[build-system]
+requires = ["uv_build>=0.7.19,<0.8.0"]
+build-backend = "uv_build"
