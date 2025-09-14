@@ -20,7 +20,14 @@ class ProperPath(Path):
     A pathlib.Path subclass that offers some additional app-development-friendly features like
     custom logging for errors, automatic user expansion, information-rich repr,
     create and remove files/directories without having to know if the path is a
-    directory or a file, etc.
+    directory or a file, etc. Example::
+
+        from properpath import ProperPath
+
+        path1 = ProperPath("~/Downloads")
+        repr(path1)
+        # Prints: ProperPath(path=/Users/culdesac/Downloads, actual=('~/Downloads',),
+        kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 
     :cvar default_err_logger: The default logger instance is used when no custom
         logger is provided to an instance.
@@ -487,7 +494,7 @@ class ProperPath(Path):
                         # shutil.rmtree() might give better
                         # traceback message. I.e., which file or directory exactly
 
-    def open(self, mode="r", encoding=None, *args):
+    def open(self, mode="r", encoding=None, *args, **kwargs):
         """
         ProperPath open instance method simply returns pathlib.Path.open.
         open() resolves the whole path first before opening.
@@ -498,11 +505,12 @@ class ProperPath(Path):
                 mode=mode,
                 encoding=encoding,
                 *args,
+                **kwargs,
             )
-        except OSError as e:
+        except (os_exception := OSError) as e:
             self.err_logger.warning(
                 f"Could not open file {self._error_helper_compare_path_source(self.actual, file)}. "
                 f"Exception: {e!r}"
             )
-            self.PathException = e
+            self.PathException = os_exception
             raise e
