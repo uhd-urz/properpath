@@ -477,14 +477,14 @@ class ProperPath(Path):
         if self.kind == "file":
             self._remove_file(verbose=verbose)
         elif self.kind == "dir":
-            ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*.*")
+            ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
             for ref in ls_ref:
                 match ProperPath(ref).kind:
                     case "file":
                         self._remove_file(_file=ref, verbose=verbose)
                         # Either FileNotFoundError and PermissionError occurring can mean that
                         # a dir path was passed when its kind is set as "file"
-                    case "dir":
+                    case "dir" if not parent_only:
                         rmtree(ref)
                         self.err_logger.debug(
                             f"Deleted directory (recursively): {ref}"

@@ -76,9 +76,8 @@ ProperPath("/etc/my_app/config.toml").create()
 
 Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, if it is empty
 or not. If the path is a directory, everything inside it will be removed recursively by default. `remove` method accepts
-a
-`parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will not do a recursion
-into other directories).
+a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only files,
+will not do a recursion into other directories).
 
 ```text
 |_.local
