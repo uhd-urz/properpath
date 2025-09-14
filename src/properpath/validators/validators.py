@@ -10,6 +10,17 @@ from .base import ValidationError, Validator
 
 
 class PathValidationError(ValidationError):
+    """
+    Represents a specialized exception raised for path validation errors.
+
+    PathValidationError is raised when a path validator (Validator subclass) fails to validate
+    a given path(s). Unlike in `OSError`, the errno is defined as an instance attribute rather
+    than a class attribute. This is to indicate that each path validation is tied to that path only.
+
+    :ivar errno: The erOSError number associated with the path validation error.
+    :type errno: Optional[int]
+    """
+
     def __init__(self, *args) -> None:
         super().__init__(*args)
         self.errno: Optional[int] = None
@@ -23,12 +34,53 @@ class PathValidationError(ValidationError):
 
 
 class PathWriteValidator(Validator):
+    """
+    Performs validation for given paths to ensure they are writable.
+
+    PathWriteValidator constructor accepts a single path instance or an iterable of path instances.
+    If the given path is a file (kind == "file"), PathWriteValidator will create the file
+    (if it doesn't already exist), then write a control character to the file and delete the character immediately after.
+    If all this passes without errors, the file is considered to be successfully validated and is returned.
+    If a directory is given, a temporary file is created inside the directory to validate write
+    permissions. If an iterable of paths is given, the first path that passes validation is returned.
+    Example::
+        user_download_paths = ["/mnt/usb/Downloads", "~/Downloads"]
+        try:
+            path = PathWriteValidator(user_download_paths).validate()
+        except PathValidationError as e:
+            raise e("All paths are not writable!")
+        else:
+            # Do something with the validated path.
+            path.write_text("...")
+
+    :ivar path: The path(s) to validate. Can be a single string path, `ProperPath`
+        object, `Path` instance, or an iterable containing these.
+    :ivar retain_created_file: Flag indicating whether created files (if the given file path already
+        doesn't exist) during validation should be retained. Defaults to `True`.
+    :ivar err_logger: Logger used for error reporting during path validation. Defaults
+        to `ProperPath.default_err_logger`.
+    """
+
     def __init__(
         self,
         path: Union[Iterable[str | ProperPath | Path], Union[str, ProperPath, Path]],
         retain_created_file: bool = True,
         err_logger: Optional[logging.Logger] = None,
     ):
+        """
+        Initializes the class with the provided paths, an option to retain the created
+        temporary files, and an optional error logger. The instance maintains these
+        parameters throughout its lifecycle.
+
+        :param path: An iterable or individual value representing paths. It can include
+            strings, ProperPath objects, or Path objects.
+        :type path: Union[Iterable[str | ProperPath | Path], Union[str, ProperPath, Path]]
+        :param retain_created_file: Flag indicating whether created files (if the given file path already
+        doesn't exist) during validation should be retained. Defaults to `True`.
+        :param err_logger: An optional Logger object used for logging errors. If not
+            provided, a default error logger will be set.
+        :type err_logger: Optional[logging.Logger]
+        """
         self.path = path
         self.err_logger = err_logger or ProperPath.default_err_logger
         self._tmp_file = (
@@ -60,6 +112,12 @@ class PathWriteValidator(Validator):
         return self.__self_created_files
 
     def validate(self) -> ProperPath:
+        """
+        :return: A validated `ProperPath` instance.
+        :rtype: ProperPath
+        :raises PathValidationError: If no valid path can be confirmed from the
+            provided list of paths.
+        """
         errno: Optional[int] = None
         _self_created_file: bool = False
         for p in self.path:
