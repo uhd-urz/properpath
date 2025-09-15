@@ -6,7 +6,7 @@
 
 An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
 `pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement with some
-extra features. The added features/APIs are mainly targeted at improving the developer experience in building CLI
+extra features. The added features/APIs are mainly aimed at improving developer experience in building CLI
 tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
 <img height="256" width="232" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
