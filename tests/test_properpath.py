@@ -181,9 +181,14 @@ def test_path_exception_handling(tmp_path):
     p_remove = ProperPath(tmp_path / "dir_as_file.txt", kind="dir")
     p_remove.create()
     p_remove.kind = "file"
-    with pytest.raises(PermissionError):
+    with pytest.raises((NotADirectoryError, PermissionError)):
+        # NotADirectoryError is the expected one. But sometimes,
+        # depending on the OS, PermissionError can also be raised
         p_remove.remove()
-    assert p_remove.PathException is PermissionError
+    assert (
+        p_remove.PathException is NotADirectoryError
+        or p_remove.PathException is PermissionError
+    )
 
 
 def test_default_path_exception():
