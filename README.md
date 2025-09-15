@@ -9,7 +9,7 @@ An opinionated OS-path module for people who take paths too seriously. `ProperPa
 extra features. The added features/APIs are mainly targeted at improving the developer experience in building CLI
 tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
-<img height="371" width="624" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
+<img height="256" width="232" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
 
 ## Usage
 
