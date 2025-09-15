@@ -267,7 +267,9 @@ class ProperPath(Path):
 
     # noinspection PyPep8Naming
     @property
-    def PathException(self) -> type[Exception] | type[BaseException]:
+    def PathException(
+        self,
+    ) -> type[Exception] | type[BaseException]:
         """
         PathException property stores an exception (like OSException) raised for the working path instance,
         before the exception is raised normally. In some ways, PathException treats
@@ -302,12 +304,15 @@ class ProperPath(Path):
     # noinspection PyPep8Naming
     @PathException.setter
     def PathException(self, value) -> None:
-        if not issubclass(value, (Exception, BaseException)):
+        if isinstance(value, (Exception, BaseException)):
+            self._PathException = type(value)
+        elif issubclass(value, (Exception, BaseException)):
+            self._PathException = value
+        else:
             raise ValueError(
-                "Only an instance of Exception or BaseException can be "
+                "Only a subclass of Exception or BaseException can be "
                 "assigned to descriptor PathException."
             )
-        self._PathException = value
 
     # noinspection PyPep8Naming
     @PathException.deleter
@@ -507,8 +512,15 @@ class ProperPath(Path):
                 *args,
                 **kwargs,
             )
+        except tuple(OSError.__subclasses__()) as e:
+            self.err_logger.debug(
+                f"Could not open file {self._error_helper_compare_path_source(self.actual, file)}. "
+                f"Exception: {e!r}"
+            )
+            self.PathException = e
+            raise e
         except (os_exception := OSError) as e:
-            self.err_logger.warning(
+            self.err_logger.debug(
                 f"Could not open file {self._error_helper_compare_path_source(self.actual, file)}. "
                 f"Exception: {e!r}"
             )
