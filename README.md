@@ -5,10 +5,9 @@
 </a>
 
 An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
-`pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement for `Path`
-with some additional features, mainly APIs concerned with developer experience in building CLI applications.
-`ProperPath` was originally
-created for [elAPI](https://github.com/uhd-urz/elAPI).
+`pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement with some
+extra features. The added features/APIs are mainly targeted at improving the developer experience in building CLI
+tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
 <img height="371" width="624" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
 
@@ -17,20 +16,21 @@ created for [elAPI](https://github.com/uhd-urz/elAPI).
 ### Drop-in `pathlib.Path` replacement
 
 Since `ProperPath` is a subclass of `pathlib.Path` it
-supports [all the APIs](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path) supported by `pathlib.Path`. A
-`pathlib.Path` instance or a path as a string or multiple path segments can be passed to `ProperPath`.
+supports [all the methods and attributes](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path) supported by
+`pathlib.Path`. We can pass a `pathlib.Path` instance or a string path or multiple path segments or `os.path` values to
+`ProperPath`.
 
 ```python
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
 >>> p
-ProperPath(path=/Users/culdesac/foo, actual=~/foo, kind=dir, err_logger=<RootLogger
+ProperPath(path=/Users/username/foo, actual=~/foo, kind=dir, err_logger=<RootLogger
 root(WARNING)>)
 >>> isinstance(p, pathlib.Path)
 True
->>> ProperPath.home()
-ProperPath(path=/Users/culdesac, actual=('/Users/culdesac',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> ProperPath.home()  # pathlib.Path's method
+ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
@@ -41,7 +41,7 @@ also be passed to `pathlib.Path` or `os.path` methods.
 >>> from pathlib import Path
 
 >>> Path(ProperPath("~"))
-PosixPath('/Users/culdesac')
+PosixPath('/Users/username')
 ```
 
 ### Is a `file` or a `dir`?
@@ -62,8 +62,6 @@ True
 >>> p.kind
 'dir'
 ```
-
-
 
 ### Built-in error logging
 
@@ -133,26 +131,26 @@ the hood both `create` and `remove` methods take advantage of the `kind` attribu
 paths: [platformdirs](https://github.com/tox-dev/platformdirs). E.g., to get OS-standard locations for configuration
 files, logs, caches, etc. See
 platformdirs [documentation](https://github.com/tox-dev/platformdirs?tab=readme-ov-file#platformdirs-for-convenience)
-for more details. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
+for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
 ```python
 >>> from properpath import ProperPath
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
-ProperPath(path=/Users/culdesac/Library/Application Support/my_app, actual=('/Users/culdesac/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_data_dir
-ProperPath(path=/Users/culdesac/Library/Application Support/my_app, actual=('/Users/culdesac/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_cache_dir
-ProperPath(path=/Users/culdesac/Library/Caches/my_app, actual=('/Users/culdesac/Library/Caches/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Caches/my_app, actual=('/Users/username/Library/Caches/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_data_dir
 ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_config_dir
 ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_documents_dir
-ProperPath(path=/Users/culdesac/Documents, actual=('/Users/culdesac/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_downloads_dir
-ProperPath(path=/Users/culdesac/Downloads, actual=('/Users/culdesac/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 >>>  # Etc. See whole list: https://github.com/tox-dev/platformdirs?tab=readme-ov-file#platformdirs-for-convenience
 ```
 
@@ -163,19 +161,19 @@ that will enforce Unix-style directory structure on macOS, but will leave Window
 ```python
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
-ProperPath(path=/Users/culdesac/.config/my_app, actual=('/Users/culdesac/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_data_dir
-ProperPath(path=/Users/culdesac/.local/share/my_app, actual=('/Users/culdesac/.local/share/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.local/share/my_app, actual=('/Users/username/.local/share/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_cache_dir
-ProperPath(path=/Users/culdesac/.cache/my_app, actual=('/Users/culdesac/.cache/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.cache/my_app, actual=('/Users/username/.cache/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_data_dir
 ProperPath(path=/usr/local/share/my_app, actual=('/usr/local/share/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_config_dir
 ProperPath(path=/etc/xdg/my_app, actual=('/etc/xdg/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_documents_dir
-ProperPath(path=/Users/culdesac/Documents, actual=('/Users/culdesac/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_downloads_dir
-ProperPath(path=/Users/culdesac/Downloads, actual=('/Users/culdesac/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 ```
 
 ### Path validation
