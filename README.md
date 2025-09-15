@@ -1,38 +1,52 @@
 # ProperPath
 
 <a href="#compatibility">
-   <img alt="Static Badge" src="https://img.shields.io/badge/python-3.13-%230d7dbe">
+   <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
 </a>
 
-An opinionated OS-path module for people who take paths too seriously. `ProperPath` is a subclass of Python's popular [
-`pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path) that offers some additional
-features for convenience in building CLI applications. `ProperPath` was originally created
-for [elAPI](https://github.com/uhd-urz/elAPI).
+An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
+`pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement for `Path`
+with some additional features, mainly APIs concerned with developer experience in building CLI applications.
+`ProperPath` was originally
+created for [elAPI](https://github.com/uhd-urz/elAPI).
 
 <img height="371" width="624" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
 
 ## Usage
 
-`ProperPath` can be used the same way as `pathlib.Path`. On the REPL (or `repr`) will show more information about the
-path.
+### Drop-in `pathlib.Path` replacement
+
+Since `ProperPath` is a subclass of `pathlib.Path` it
+supports [all the APIs](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path) supported by `pathlib.Path`. A
+`pathlib.Path` instance or a path as a string or multiple path segments can be passed to `ProperPath`.
 
 ```python
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
 >>> p
-ProperPath(path= /Users/culdesac/foo, actual = ~/foo, kind=dir, err_logger=<RootLogger
+ProperPath(path=/Users/culdesac/foo, actual=~/foo, kind=dir, err_logger=<RootLogger
 root(WARNING)>)
 >>> isinstance(p, pathlib.Path)
 True
-
+>>> ProperPath.home()
+ProperPath(path=/Users/culdesac, actual=('/Users/culdesac',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 ```
 
-You can pass a `pathlib.Path` instance to `ProperPath` and vice versa.
+`ProperPath` shows more information about the path on the REPL (or a [
+`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). A `ProperPath` instance can
+also be passed to `pathlib.Path` or `os.path` methods.
 
-### Path `kind`
+```python
+>>> from pathlib import Path
 
-A `ProperPath` instance will determine if the path is a file or a directory during instance creation and store it in
+>>> Path(ProperPath("~"))
+PosixPath('/Users/culdesac')
+```
+
+### Is a `file` or a `dir`?
+
+A `ProperPath` instance will determine if the path is a file or a directory during instance creation, and store it in
 `kind` attribute. If the path doesn't exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
@@ -40,7 +54,7 @@ A `ProperPath` instance will determine if the path is a file or a directory duri
 >>> p = ProperPath("~/foo.txt")
 >>> p.exists()
 False
->>> p.kind
+>>> p.kind  # Kind is determined from the file extension.
 'file'
 >>> p = ProperPath("~/foo")
 >>> p.exists()
@@ -49,22 +63,39 @@ True
 'dir'
 ```
 
-### Path instance-wide error logging
 
-A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations. If no
-logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute.
+
+### Built-in error logging
+
+A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that path instance. If no
+logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python root logger).
 
 ```python
-logger = logging.getLogger("new_logger")
-p = ProperPath("~/Downloads/metadata.txt", err_logger=logger)
-
-with p.open("w") as f:
-    f.write("Hello, world!")
+>>> import logging
+>>> logging.basicConfig(level=logging.DEBUG)
+>>> p = ProperPath("/var/log/my_app.log")
+>>> with p.open("w") as f:
+...     f.write("Hello, world!")
+...
+DEBUG:root:Could not open file PATH=/private/var/log/my_app.log from SOURCE=('/var/log/my_app.log',). 
+Exception: PermissionError(13, 'Permission denied')
+Traceback (most recent call last):
+  File "<python-input-4>", line 1, in <module>
+    with p.open("w") as f:
+         ~~~~~~^^^^^
 # Any exception raised during path operations will be logged to the new_logger, 
 # before being raised.
 ```
 
-### Path `create` and `remove` methods
+**Note:** All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
+to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
+debugging/development. We can also pass our own custom logger to
+`ProperPath("/var/log/my_app.log", err_logger=logging.getLogger("my_logger"))`, or modify the `err_logger` attribute at
+runtime. Each logger is tied to the instance it was passed to. If we want to have a single logger to be shared with all
+instances of `ProperPath`, we just set the class attribute
+`ProperPath.default_err_logger = logging.getLogger("my_logger")`.
+
+### `create` and `remove` paths
 
 To create a new file or directory, `pathlib.Path` would require a boilerplate `if path.is_file():` or
 `if path.is_dir():` block if the path is unknown. `ProperPath` provides the `create` method that simplifies this step.
@@ -74,24 +105,27 @@ Just call `create` on any path to create it. If the path already exists, nothing
 ProperPath("/etc/my_app/config.toml").create()
 ```
 
-Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, if it is empty
+Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is empty
 or not. If the path is a directory, everything inside it will be removed recursively by default. `remove` method accepts
-a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only files,
+a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the files,
 will not do a recursion into other directories).
 
 ```text
-|_.local
-    |_ share
-        |_ my_app
-            |_ config.toml
-            |_ custom/
-                |_ plugins/
+.local/
+├─ share/
+│  ├─ my_app/
+│  │  ├─ custom/
+│  │  │  ├─ plugins/
+│  │  ├─ config.toml
 ```
 
 ```python
 ProperPath("~/.local/share/my_app/").remove(parent_only=True)
-# Only ~/.local/share/my_app/config.toml will be removed. custom/ and plugins/ will be left alone.
 ```
+
+The code above will only `~/.local/share/my_app/config.toml`, and leave `custom/` and `plugins/` directories as is. If
+`parents_only=False` is passed (the default), everything inside `my_app` directory will be deleted recursively. Under
+the hood both `create` and `remove` methods take advantage of the `kind` attribute.
 
 ### Better Platformdirs
 
@@ -186,3 +220,16 @@ except p.PathException as e:
 ```
 
 In some ways, `PathException` treats errors as values.
+
+## Why is the Python compatibility 3.12 and above?
+
+Before Python 3.12, subclassing `pathlib.Path` was tricky and riddled with odd bugs even when done so carefully. In
+fact, composition, and not inheritance, was the best option to extend `pathlib.Path` until Python 3.12.
+Python 3.12 addressed this issue
+and [fixed subclassing](https://docs.python.org/3/whatsnew/3.12.html#summary-release-highlights) for `pathlib.Path`.
+
+## Credits
+
+The background in the banner art was taken from
+this [public domain image](https://www.publicdomainpictures.net/en/view-image.php?image=212703&picture=road-in-a-desert).
+And the car was generated with Google Gemini.
