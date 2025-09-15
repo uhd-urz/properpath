@@ -419,17 +419,20 @@ class ProperPath(Path):
             self.err_logger.debug(message)
             self.PathException = permission_exception
             raise e
-        except (not_a_dir_exception := NotADirectoryError) as e:
-            # Both "file" and "dir" cases are handled, but when the path is under special files like
-            # /dev/null/<directory name>, os.mkdir() will throw NotADirectoryError.
-            message = f"Couldn't create {self._error_helper_compare_path_source(self.actual, path)}."
-            self.err_logger.debug(message)
-            self.PathException = not_a_dir_exception
+        except tuple(OSError.__subclasses__()) as e:
+            self.err_logger.debug(
+                f"Could not create {self._error_helper_compare_path_source(self.actual, path)}. "
+                f"Exception: {e!r}"
+            )
+            self.PathException = e
             raise e
         except (os_exception := OSError) as os_err:
             # When an attempt to create a file or directory inside root (e.g., '/foo')
             # is made, OS can throw OSError with error no. 30 instead of PermissionError.
-            self.err_logger.debug(os_err)
+            self.err_logger.debug(
+                f"Could not create {self._error_helper_compare_path_source(self.actual, path)}. "
+                f"Exception: {os_err!r}"
+            )
             self.PathException = os_exception
             raise os_err
 
@@ -444,14 +447,6 @@ class ProperPath(Path):
             )
         try:
             file.unlink()
-        except (file_not_found_exception := FileNotFoundError) as e:
-            # unlink() throws FileNotFoundError when a directory is passed as it expects files only
-            self.err_logger.error(
-                f"Could not remove {self._error_helper_compare_path_source(self.actual, file)}. "
-                f"Exception: {e!r}"
-            )
-            self.PathException = file_not_found_exception
-            raise e
         except (permission_exception := PermissionError) as e:
             message = (
                 f"Permission to remove {self._error_helper_compare_path_source(self.actual, file)} "
@@ -459,6 +454,20 @@ class ProperPath(Path):
             )
             self.err_logger.debug(message)
             self.PathException = permission_exception
+            raise e
+        except tuple(OSError.__subclasses__()) as e:
+            self.err_logger.debug(
+                f"Could not remove {self._error_helper_compare_path_source(self.actual, file)}. "
+                f"Exception: {e!r}"
+            )
+            self.PathException = e
+            raise e
+        except (os_exception := OSError) as e:
+            self.err_logger.debug(
+                f"Could not remove {self._error_helper_compare_path_source(self.actual, file)}. "
+                f"Exception: {e!r}"
+            )
+            self.PathException = os_exception
             raise e
         if verbose:
             self.err_logger.debug(f"Removed file: {file}")
