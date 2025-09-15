@@ -4,8 +4,8 @@ version = "0.2.1"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 
-description = "An extended Python pathlib.Path"
-requires-python = ">=3.13"
+description = "A pathlib.Path drop-in replacement with extra features. "
+requires-python = ">=3.12"
 dependencies = [
     "platformdirs>=4.4.0,<4.5.0",
 ]
