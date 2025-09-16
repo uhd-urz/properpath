@@ -113,7 +113,7 @@ class PathWriteValidator(Validator):
         Returns:
             ProperPath: A validated `ProperPath` instance.
         Raises:
-            PathValidationError: If no valid path can be confirmed from the
+            (PathValidationError): If no valid path can be confirmed from the
             provided list of paths.
         """
         errno: Optional[int] = None

@@ -132,7 +132,7 @@ class ProperPath(Path):
                 for both macOS and Linux. Defaults to False.
 
         Returns:
-            PlatformDirs: An instance of the appropriate platform directory handler
+            (PlatformDirs): An instance of the appropriate platform directory handler
         """
 
         dirs: ProperPlatformDirs | ProperUnix
@@ -294,7 +294,7 @@ class ProperPath(Path):
             ```
 
         Returns:
-            type[Exception] | type[BaseException]: The exception thrown for the working path instance.
+            (type[Exception] | type[BaseException]): The exception thrown for the working path instance.
         """
         return self._PathException
 
@@ -332,7 +332,7 @@ class ProperPath(Path):
         file suffixes. Kind can also handle special files like /dev/null. kind is set during instance creation.
 
         Returns:
-            Literal["file", "dir"]: "file" or "dir" depending on the path.
+            (Literal["file", "dir"]): "file" or "dir" depending on the path.
         """
 
         # noinspection PyTypeChecker
