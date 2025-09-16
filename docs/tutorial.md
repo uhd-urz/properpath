@@ -7,7 +7,7 @@ supports [all the methods and attributes](https://docs.python.org/3.12/library/p
 `pathlib.Path`. We can pass a `pathlib.Path` instance or a string path or multiple path segments or `os.path` values to
 `ProperPath`.
 
-```{ .python .no-copy title="Python REPL" linenums="0" }
+```{ .python .no-copy title="Python REPL" linenums="0" hl_lines="4" }
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
@@ -21,8 +21,8 @@ ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=T
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
-`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). A `ProperPath` instance can
-also be passed to `pathlib.Path` or `os.path` methods.
+`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` **always expands the username** (`~`) segment by default. 
+A `ProperPath` instance can also be passed to `pathlib.Path` or `os.path` methods.
 
 ```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> from pathlib import Path
