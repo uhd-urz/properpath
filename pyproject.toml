@@ -28,3 +28,9 @@ dev = [
     "pytest>=8.4.2",
     "ruff>=0.13.0",
 ]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    "tests/extra_test",
+]
