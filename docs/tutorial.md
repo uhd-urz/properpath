@@ -7,7 +7,7 @@ supports [all the methods and attributes](https://docs.python.org/3.12/library/p
 `pathlib.Path`. We can pass a `pathlib.Path` instance or a string path or multiple path segments or `os.path` values to
 `ProperPath`.
 
-```{ .python .no-copy title="Python REPL" }
+```{ .python .no-copy title="Python REPL" linenums="0" }
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
@@ -24,7 +24,7 @@ ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=T
 `repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). A `ProperPath` instance can
 also be passed to `pathlib.Path` or `os.path` methods.
 
-```{ .python .no-copy title="Python REPL" }
+```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> from pathlib import Path
 
 >>> Path(ProperPath("~"))
@@ -37,7 +37,7 @@ A `ProperPath` instance will determine if the path is a file or a directory duri
 `kind` attribute. If the path doesn't exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
-```{ .python .no-copy title="Python REPL" }
+```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> p = ProperPath("~/foo.txt")
 >>> p.exists()
 False
@@ -55,7 +55,7 @@ True
 A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that path instance. If no
 logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python root logger).
 
-```{ .python .no-copy title="Python REPL" hl_lines="7 8"}
+```{ .python .no-copy title="Python REPL" hl_lines="7 8" linenums="0"}
 >>> import logging
 >>> logging.basicConfig(level=logging.DEBUG)
 >>> p = ProperPath("/var/log/my_app.log")
@@ -72,9 +72,13 @@ Traceback (most recent call last):
 # before being raised.
 ```
 
-**Note:** All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
-to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
-debugging/development. We can also pass our own custom logger to
+!!! note
+
+    All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
+    to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
+    debugging/development. 
+
+We can also pass our own custom logger to
 `ProperPath("/var/log/my_app.log", err_logger=logging.getLogger("my_logger"))`, or modify the `err_logger` attribute at
 runtime. Each logger is tied to the instance it was passed to. If we want to have a single logger to be shared with all
 instances of `ProperPath`, we just set the class attribute
@@ -95,7 +99,7 @@ or not. If the path is a directory, everything inside it will be removed recursi
 a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the files,
 will not do a recursion into other directories).
 
-```text
+```text linenums="0"
 .local/
 ├─ share/
 │  ├─ my_app/
@@ -121,7 +125,7 @@ platformdirs [documentation](https://github.com/tox-dev/platformdirs?tab=readme-
 for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
-```{ .python .no-copy title="Python REPL" }
+```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> from properpath import ProperPath
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
@@ -145,7 +149,7 @@ Platformdirs enforces a strict directory structure for macOS, but many tools out
 structures on macOS as well. `ProperPath` provides an additional `follow_unix` argument to `ProperPath.platformdirs`
 that will enforce Unix-style directory structure on macOS, but will leave Windows as is.
 
-```{ .python .no-copy title="Python REPL" }
+```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
 ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)

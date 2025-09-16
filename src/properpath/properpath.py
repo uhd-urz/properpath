@@ -23,14 +23,15 @@ class ProperPath(Path):
     automatic user expansion, information-rich repr, and the ability to create and remove
     files/directories without having to know their type.
 
-    Examples:
-
+    Example:
+        ```python
         from properpath import ProperPath
 
         path1 = ProperPath("~/Downloads")
         repr(path1)
         # Prints: ProperPath(path=/Users/culdesac/Downloads, actual=('~/Downloads',),
         kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+        ```
 
     Attributes:
         default_err_logger (logging.Logger): The default logger instance used when no custom
@@ -94,8 +95,8 @@ class ProperPath(Path):
         be altered.
 
 
-        Examples:
-
+        Example:
+            ```python  hl_lines="3 8 13"
             app_dirs = ProperPath.platformdirs("MyApp", "MyOrg")
             app_dirs.user_data_dir
             # Returns ProperPath('/Users/user/Library/Application Support/MyApp')
@@ -109,6 +110,7 @@ class ProperPath(Path):
             dirs = ProperPath.platformdirs("MyApp", version="1.0", roaming=True)
             dirs.user_config_dir
             # Returns ProperPath('/Users/user/Library/Application Support/MyApp/1.0')
+            ```
 
         Args:
             appname (Optional[str]): The name of the app author or distributing body for this application.
@@ -214,10 +216,11 @@ class ProperPath(Path):
         ProperPath instance. ProperPath by default expands any user indicator "~"
         automatically and uses the expanded path internally. The actual will show the non-expanded value.
 
-        Examples:
-
+        Example:
+            ```python
             ProperPath("~", "foo").actual
             # Returns ("~", "foo")
+            ```
 
         Returns:
             Iterable[str]: The path value
@@ -269,7 +272,7 @@ class ProperPath(Path):
         doesn't matter, but any path from a list of available paths can be used for the user.
 
         Example:
-
+            ```python
             # Storing data to a file of from a list of fallback file paths:
             path_exceptions = []
 
@@ -288,6 +291,7 @@ class ProperPath(Path):
                 # When all paths failed, raise the last exception (or all exceptions).
                 path.err_logger.error(f"Couldn't write to any of the fallback paths. Exceptions: {path_exceptions}")
                 raise path.PathException
+            ```
 
         Returns:
             type[Exception] | type[BaseException]: The exception thrown for the working path instance.

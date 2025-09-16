@@ -44,8 +44,8 @@ class PathWriteValidator(Validator):
     If a directory is given, a temporary file is created inside the directory to validate write
     permissions. If an iterable of paths is given, the first path that passes validation is returned.
 
-    Examples:
-
+    Example:
+        ```python
         user_download_paths = ["/mnt/usb/Downloads", "~/Downloads"]
         try:
             path = PathWriteValidator(user_download_paths).validate()
@@ -54,6 +54,7 @@ class PathWriteValidator(Validator):
         else:
             # Do something with the validated path.
             path.write_text("...")
+        ```
     """
 
     def __init__(
@@ -70,9 +71,10 @@ class PathWriteValidator(Validator):
         Args:
             path (Union[Iterable[str | ProperPath | Path], Union[str, ProperPath, Path]]): An iterable or individual value representing paths. It can include
                 strings, ProperPath objects, or Path objects.
+
         Keyword Args:
             retain_created_file (bool): Flag indicating whether created files (if the given file path already
-            doesn't exist) during validation should be retained. Defaults to `True`.
+                doesn't exist) during validation should be retained. Defaults to `True`.
             err_logger (Optional[logging.Logger]): An optional Logger object used for logging errors. If not
                 provided, a default error logger will be set.
         """

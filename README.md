@@ -9,7 +9,7 @@ An opinionated OS-path module for people who take paths too seriously. `ProperPa
 extra features. The added features/APIs are mainly aimed at improving developer experience in building CLI
 tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
-<img height="256" width="232" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
+<img height="312" width="670" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
 
 ## Usage
 
@@ -229,5 +229,5 @@ and [fixed subclassing](https://docs.python.org/3/whatsnew/3.12.html#summary-rel
 ## Credits
 
 The background in the banner art was taken from
-this [public domain image](https://www.publicdomainpictures.net/en/view-image.php?image=212703&picture=road-in-a-desert).
-And the car was generated with Google Gemini.
+this [stock photo](https://www.pexels.com/photo/aerial-view-of-road-in-the-middle-of-trees-1173777/), and transformed
+into pixel art with AI.
