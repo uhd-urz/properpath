@@ -31,7 +31,7 @@ uv add properpath
 
 Open a Python REPL and try the following:
 
-```python
+```{ .python .no-copy title="Python REPL" linenums="0" }
 >>> from properpath import ProperPath
 
 >>> ProperPath("~")

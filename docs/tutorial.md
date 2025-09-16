@@ -125,7 +125,7 @@ platformdirs [documentation](https://github.com/tox-dev/platformdirs?tab=readme-
 for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
-```{ .python .no-copy title="Python REPL" linenums="0" }
+```{ .python .no-copy title="Python REPL" linenums="0" hl_lines="3 5 7 9 11 13 15" }
 >>> from properpath import ProperPath
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
@@ -149,7 +149,7 @@ Platformdirs enforces a strict directory structure for macOS, but many tools out
 structures on macOS as well. `ProperPath` provides an additional `follow_unix` argument to `ProperPath.platformdirs`
 that will enforce Unix-style directory structure on macOS, but will leave Windows as is.
 
-```{ .python .no-copy title="Python REPL" linenums="0" }
+```{ .python .no-copy title="Python REPL" linenums="0" hl_lines="2 4 6 8 10 12 14" }
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
 ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
