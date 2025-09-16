@@ -1,0 +1,61 @@
+site_name: ProperPath Documentation
+site_url: https://mydomain.org/mysite
+repo_url: https://github.com/uhd-urz/properpath
+repo_name: uhd-urz/properpath
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  logo: assets/path.svg
+  favicon: assets/path.svg
+  font:
+    text: Lato
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.path
+    - search.suggest
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+extra:
+  version:
+    provider: mike
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/uhd-urz/properpath
+      name: GitHub Repository
+    - icon: fontawesome/solid/globe
+      link: https://www.urz.uni-heidelberg.de/en
+      name: Website
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+      options:
+        allow_inspection: true
+        docstring_style: "google"

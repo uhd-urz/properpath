@@ -1,0 +1,20 @@
+[data-md-color-scheme="slate"] {
+    --md-default-bg-color: #212121;
+    --md-primary-fg-color: #9A3F3F;
+    --md-accent-fg-color: #9A3F3F;
+    --md-accent-fg-color--transparent: #9A3F3F1c;
+}
+
+
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #9A3F3F;
+    --md-default-bg-color: #f6f1f2;
+    --md-code-bg-color: #e7e3de;
+    --md-accent-fg-color: #9A3F3F;
+    --md-accent-fg-color--transparent: #9A3F3F1c;
+}
+
+.md-typeset pre > code {
+    white-space: pre-wrap;
+    /* Allow line wraps */
+}
