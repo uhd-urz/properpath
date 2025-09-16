@@ -17,9 +17,9 @@ class NoException(Exception):
 
 class ProperPath(Path):
     """
-    A pathlib.Path subclass that is a drop-in replacement for pathlib.Path.
+    A `pathlib.Path` subclass that is a drop-in replacement for `pathlib.Path` module.
 
-    ProperPath provides additional features such as custom logging for errors,
+    `ProperPath` provides additional features such as custom logging for errors,
     automatic user expansion, information-rich repr, and the ability to create and remove
     files/directories without having to know their type.
 
@@ -34,8 +34,8 @@ class ProperPath(Path):
         ```
 
     Attributes:
-        default_err_logger (logging.Logger): The default logger instance used when no custom
-            logger is provided to an instance.
+        default_err_logger (logging.Logger): The default logger instance shared between all instances of `ProperPath` when no custom
+            logger `err_logger` is provided to an instance.
     """
 
     default_err_logger: logging.Logger = logging.getLogger()
@@ -47,18 +47,19 @@ class ProperPath(Path):
         err_logger: Optional[logging.Logger] = None,
     ):
         """
-        Initializes a ProperPath instance. A ProperPath instance can be passed to pathlib.Path and vice versa.
+        Initializes a `ProperPath` instance. A `ProperPath` instance can be passed to `pathlib.Path` and vice versa.
 
         Args:
-            actual: A collection of paths provided as strings, `Path` objects,
+            actual (Union[str, Path, "ProperPath"]): A collection of paths provided as strings, `Path` objects,
                 or `ProperPath` objects that represent the input paths to be processed.
-                This acts just like the first argument passed to pathlib.Path.  E.g., ProperPath("~", "foo")
+                This acts just like the first argument passed to `pathlib.Path`.
+                E.g., `ProperPath("~", "foo")`.
 
         Keyword Args:
-            kind: An optional string to indicate if the path is a file or a directory. If it is None (the default),
+            kind (Optional[str]): An optional string to indicate if the path is a file or a directory. If it is `None` (the default),
                 ProperPath will try to determine the kind automatically based on file suffixes and various other patterns.
-            err_logger: An optional `Logger` object for handling error logging.
-                If None, the class instance default_err_logger is used.
+            err_logger (Optional[logging.Logger]): An optional `Logger` object for handling error logging.
+                If `None`, the class instance default_err_logger is used.
         """
 
         self._kind: Literal["file", "dir"]
@@ -81,16 +82,16 @@ class ProperPath(Path):
         follow_unix: bool = False,
     ) -> ProperPlatformDirs:
         """
-        Initializes and returns a platformdirs.PlatformDirs instance.
+        Initializes and returns a `platformdirs.PlatformDirs` instance.
 
         Provides appropriate platform-specific application directories (e.g., OS-standard
         location for configuration files, logs, shared files, caches, etc.).
         See platformdirs documentation for more details: https://github.com/tox-dev/platformdirs
 
         platformdirs doesn't offer a way to get Unix-like directories on macOS which may not
-        be always desired. So, ProperPath.platformdirs offers an additional argument
-        "follow_unix" which is False by default. If "follow_unix" is True,
-        ProperPath.platformdirs will return an instance that follows Unix-like directory
+        be always desired. So, `ProperPath.platformdirs` offers an additional argument
+        `follow_unix` which is False by default. If `follow_unix` is True,
+        `ProperPath.platformdirs` will return an instance that follows a Unix-like directory
         structure for both macOS and Linux-based operating systems. Windows paths will not
         be altered.
 
@@ -178,7 +179,7 @@ class ProperPath(Path):
     def __repr__(self):
         """
         Returns:
-            str: An information-rich representation of the ProperPath instance.
+            (str): An information-rich representation of the ProperPath instance.
         """
         return (
             f"{self.__class__.__name__}(path={self}, actual={self.actual}, "
@@ -191,8 +192,8 @@ class ProperPath(Path):
 
     def __deepcopy__(self, memo):
         """
-        ProperPath, likely due to being a victim of inheritance hell, can throw odd errors when it is deepcopied
-        as a namedtuple. The __deepcopy__ method is overridden to avoid that. Notice, only instance attributes are
+        `ProperPath`, likely due to being a victim of inheritance hell, can throw odd errors when it is deepcopied
+        as a namedtuple. The `__deepcopy__` method is overridden to avoid that. Notice, only instance attributes are
         deepcopied, not properties.
 
         Args:
@@ -213,8 +214,9 @@ class ProperPath(Path):
     def actual(self) -> Iterable[str]:
         """
         Provides access to the user-given path (or path segments) that was passed to the constructor of the
-        ProperPath instance. ProperPath by default expands any user indicator "~"
-        automatically and uses the expanded path internally. The actual will show the non-expanded value.
+        `ProperPath` instance. `ProperPath` by default expands any user indicator `"~"`
+        automatically and uses the expanded path for all operations. The `actual` attribute will reveal
+        the non-expanded original value.
 
         Example:
             ```python
@@ -223,7 +225,7 @@ class ProperPath(Path):
             ```
 
         Returns:
-            Iterable[str]: The path value
+            (Iterable[str]): The path value
         """
         return self._actual
 
@@ -245,10 +247,10 @@ class ProperPath(Path):
     def err_logger(self):
         """
         Provides access to the error logger that is used for logging exceptions.
-        The default logger is ProperPath.default_err_logger.
+        The default logger is `ProperPath.default_err_logger`.
 
         Returns:
-            Logger: The error logger instance.
+            (Logger): The error logger instance.
         """
         return self._err_logger
 
@@ -266,9 +268,9 @@ class ProperPath(Path):
         self,
     ) -> type[Exception] | type[BaseException]:
         """
-        PathException property stores an exception (like OSException) raised for the working path instance,
-        before the exception is raised normally. In some ways, PathException treats
-        errors/exceptions as values. PathException can be used to create design patterns where one path failing,
+        `PathException` property stores an exception (like `OSException`) raised for the working path instance,
+        before the exception is raised normally. In some ways, `PathException` treats
+        errors/exceptions as values. `PathException` can be used to create design patterns where one path failing
         doesn't matter, but any path from a list of available paths can be used for the user.
 
         Example:
@@ -374,9 +376,9 @@ class ProperPath(Path):
 
     def create(self, verbose: bool = True) -> None:
         """
-        Creates a file or directory based on the specified kind (file or dir). Thanks to property "kind",
-        the "create" method helps to avoid writing boilerplate code like "if path.is_file()"
-        or "path.is_dir()". For files and directories, it ensures the parent directory exists
+        Creates a file or directory based on the specified kind (file or dir). Thanks to the property `kind`,
+        the `create` method helps to avoid writing boilerplate code like `if path.is_file()`
+        or `path.is_dir()`. For files and directories, it ensures the parent directory exists
         before creating the file. Logs operations and exceptions for debugging.
 
         Args:
@@ -388,8 +390,8 @@ class ProperPath(Path):
                 or directory.
             NotADirectoryError: If the operation attempts to create a directory
                 under a path that is incorrectly treated as a non-directory.
-            OSError: If an OS-level error (all others excluding PermissionError and
-                NotADirectoryError) occurs during the creation process.
+            OSError: If an OS-level error (all others excluding `PermissionError` and
+                `NotADirectoryError`) occurs during the creation process.
 
         Returns:
             None
@@ -475,17 +477,19 @@ class ProperPath(Path):
 
     def remove(self, parent_only: bool = False, verbose: bool = True) -> None:
         """
-        Removes the ProperPath file or directory based on the specified parameters. The method
+        Removes the `ProperPath` file or directory based on the specified parameters. The method
         removes either all contents of a directory path or a single file, depending on the type of
         the path (file or directory). If `parent_only` is True, only top-level contents are removed
         while keeping the parent directory intact. If `parent_only` is False, all contents are
-        removed recursively. Verbose can be set to True (default) to log the removal.
+        removed recursively. `verbose` can be passed `False` (default is `True`) to disable logging
+        the removals.
 
         Args:
             parent_only (bool): A boolean flag indicating whether only the immediate children of the
-            directory should be removed, leaving the parent directory intact. Defaults to False.
+                directory should be removed, leaving the parent directory intact. Defaults to `False`.
             verbose (bool): A boolean flag indicating whether detailed logs of the removal operations
-            should be printed or logged. Defaults to True.
+                should be printed or logged. Defaults to `True`.
+
         Returns:
             None
         """

@@ -13,7 +13,7 @@ class PathValidationError(ValidationError):
     """
     Represents a specialized exception raised for path validation errors.
 
-    PathValidationError is raised when a path validator (Validator subclass) fails to validate
+    `PathValidationError` is raised when a path validator (Validator subclass) fails to validate
     a given path(s). Unlike in `OSError`, the errno is defined as an instance attribute rather
     than a class attribute. This is to indicate that each path validation is tied to that path only.
 
@@ -35,9 +35,9 @@ class PathValidationError(ValidationError):
 
 class PathWriteValidator(Validator):
     """
-    Performs validation for given paths to ensure they are writable.
+    `PathWriteValidator` does validation for given paths to make sure they are writable.
 
-    PathWriteValidator constructor accepts a single path instance or an iterable of path instances.
+    `PathWriteValidator` constructor accepts a single path instance or an iterable of path instances.
     If the given path is a file (`kind == "file"`), PathWriteValidator will create the file
     (if it doesn't already exist), then write a control character to the file and delete the character immediately after.
     If all this passes without errors, the file is considered to be successfully validated and is returned.
@@ -111,10 +111,11 @@ class PathWriteValidator(Validator):
     def validate(self) -> ProperPath:
         """
         Returns:
-            ProperPath: A validated `ProperPath` instance.
+            (ProperPath): A validated `ProperPath` instance.
+
         Raises:
-            (PathValidationError): If no valid path can be confirmed from the
-            provided list of paths.
+            (PathValidationError): If no path from the given list of paths can be validated.
+
         """
         errno: Optional[int] = None
         _self_created_file: bool = False
