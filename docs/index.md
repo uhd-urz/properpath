@@ -2,6 +2,7 @@
 
 <a href="#compatibility">
    <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
+   <img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
 </a>
 
 An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
