@@ -33,8 +33,8 @@ PosixPath('/Users/username')
 
 ## Is a `file` or a `dir`?
 
-A `ProperPath` instance will determine if the path is a file or a directory during instance creation, and store it in
-`kind` attribute. If the path doesn't exist beforehand, `PropePath` will try to assume it from the path's extension.
+A `ProperPath` instance stores whether the path is a file or a directory in the `kind` attribute. If the path doesn't
+exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
 ```{ .python .no-copy title="Python REPL" linenums="0" }
@@ -48,6 +48,29 @@ False
 True
 >>> p.kind
 'dir'
+```
+
+In this code block though we could just use `is_dir()`. The real power of `kind` comes though, when we're working with
+files/directories that aren't strictly created or handled by us, but we know what `kind` we are expecting. We can pass
+the expected `kind` as an argument to the
+constructor during the path instance creation. Pure `ProperPath` operations will expect that `kind` for that for all
+future operations. This can help catch unexpected errors. An example: Let's consider a situation where we expect a
+**file** named `foo` to exist in user's `~/Downloads` folder. But for whatever reason, a directory with the exact the
+same name already exists in `~/Downloads`. If we want to create the file with
+`pathlib.Path("~/Downloads/foo").expanduser().touch(exist_ok=True)`, the method will succeed, and we will have assumed a
+_file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and throw an error.
+
+```{ .python .no-copy title="Python REPL" linenums="0" hl_lines="10" }
+>>> q = ProperPath("~/Downloads", "foo", kind="file")
+ProperPath(path=/Users/username/Downloads/foo, actual=('/Users/username/Downloads/foo',), kind=file, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> q.create()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/username/Workshop/properpath/src/properpath/properpath.py", line 441, in create
+    raise e
+  File "/Users/username/Workshop/properpath/src/properpath/properpath.py", line 421, in create
+    raise is_a_dir_exception(message)
+IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/username/Downloads from SOURCE=('~/Downloads', 'foo').
 ```
 
 ## Built-in error logging

@@ -62,7 +62,7 @@ class ProperPath(Path):
                 If `None`, the class instance default_err_logger is used.
         """
 
-        self._kind: Literal["file", "dir"]
+        self._kind: Literal["file", "dir"] | None
         self.actual = actual
         super().__init__(self._expanded)
         self.kind = kind
@@ -331,18 +331,13 @@ class ProperPath(Path):
         """
         Retrieves the path kind: a "file" or a "dir".
         If the path exists, kind already knows what kind it is. If the path doesn't exist, kind tries to assume the kind from
-        file suffixes. Kind can also handle special files like /dev/null. kind is set during instance creation.
+        file suffixes. Kind can also handle special files like `/dev/null`. An expected/future `kind` can be passed to the
+        constructor during instance creation.
 
         Returns:
             (Literal["file", "dir"]): "file" or "dir" depending on the path.
         """
-
-        # noinspection PyTypeChecker
-        return self._kind
-
-    @kind.setter
-    def kind(self, value) -> None:
-        if value is None:
+        if self._kind is None:
             self._kind = (
                 "dir"
                 if super().is_dir()
@@ -352,6 +347,13 @@ class ProperPath(Path):
                 # since is_file() doesn't consider /dev/null to be a file!
                 else "dir"
             )
+        # noinspection PyTypeChecker
+        return self._kind
+
+    @kind.setter
+    def kind(self, value) -> None:
+        if value is None:
+            self._kind = None
         else:
             match value.lower():
                 case "file":
@@ -409,6 +411,14 @@ class ProperPath(Path):
                         )
                     path_parent.mkdir(parents=True, exist_ok=True)
                     (path_parent / path_file).touch(exist_ok=True)
+                    if not (path_parent / path_file).is_file():
+                        is_a_dir_exception = IsADirectoryError
+                        message = (
+                            "File was expected but a directory with the same name was found: "
+                            f"{self._error_helper_compare_path_source(self.actual, path_parent)}. "
+                        )
+                        self.err_logger.debug(message)
+                        raise is_a_dir_exception(message)
                 case "dir":
                     if not path.exists() and verbose:
                         self.err_logger.debug(
