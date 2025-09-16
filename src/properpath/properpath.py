@@ -366,7 +366,7 @@ class ProperPath(Path):
 
     @staticmethod
     def _error_helper_compare_path_source(
-        source: Union[Path, str], target: Union[Path, str]
+        source: Union[Path, str, Iterable[str]], target: Union[Path, str]
     ) -> str:
         return (
             f"PATH={target} from SOURCE={source}"
