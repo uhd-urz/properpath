@@ -3,7 +3,7 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 from shutil import rmtree
-from typing import Literal, Optional, Self, Union
+from typing import Iterable, Literal, Optional, Self, Union
 
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
 
@@ -17,10 +17,13 @@ class NoException(Exception):
 
 class ProperPath(Path):
     """
-    A pathlib.Path subclass that offers some additional app-development-friendly features like
-    custom logging for errors, automatic user expansion, information-rich repr,
-    create and remove files/directories without having to know if the path is a
-    directory or a file, etc. Example::
+    A pathlib.Path subclass that is a drop-in replacement for pathlib.Path.
+
+    ProperPath provides additional features such as custom logging for errors,
+    automatic user expansion, information-rich repr, and the ability to create and remove
+    files/directories without having to know their type.
+
+    Examples:
 
         from properpath import ProperPath
 
@@ -29,9 +32,9 @@ class ProperPath(Path):
         # Prints: ProperPath(path=/Users/culdesac/Downloads, actual=('~/Downloads',),
         kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 
-    :cvar default_err_logger: The default logger instance is used when no custom
-        logger is provided to an instance.
-    :type default_err_logger: logging.Logger
+    Attributes:
+        default_err_logger (logging.Logger): The default logger instance used when no custom
+            logger is provided to an instance.
     """
 
     default_err_logger: logging.Logger = logging.getLogger()
@@ -45,18 +48,16 @@ class ProperPath(Path):
         """
         Initializes a ProperPath instance. A ProperPath instance can be passed to pathlib.Path and vice versa.
 
-        :param actual: A collection of paths provided as strings, `Path` objects,
-            or `ProperPath` objects that represent the input paths to be processed.
-            This acts just like the first argument passed to pathlib.Path.  E.g., ProperPath("~", "foo")
-        :type actual: Union[str, Path, ProperPath]
+        Args:
+            actual: A collection of paths provided as strings, `Path` objects,
+                or `ProperPath` objects that represent the input paths to be processed.
+                This acts just like the first argument passed to pathlib.Path.  E.g., ProperPath("~", "foo")
 
-        :param kind: An optional string to indicate if the path is a file or a directory. If it is None (the default),
-            ProperPath will try to determine the kind automatically based on file suffixes and various other patterns.
-        :type kind: Optional[str]
-
-        :param err_logger: An optional `Logger` object for handling error logging.
-            If None, the class instance default_err_logger is used.
-        :type err_logger: Optional[logging.Logger]
+        Keyword Args:
+            kind: An optional string to indicate if the path is a file or a directory. If it is None (the default),
+                ProperPath will try to determine the kind automatically based on file suffixes and various other patterns.
+            err_logger: An optional `Logger` object for handling error logging.
+                If None, the class instance default_err_logger is used.
         """
 
         self._kind: Literal["file", "dir"]
@@ -79,17 +80,21 @@ class ProperPath(Path):
         follow_unix: bool = False,
     ) -> ProperPlatformDirs:
         """
-        Initializes and returns a "platformdirs.PlatformDirs" instance that offers
-        appropriate platform-specific application directories. E.g., OS-standard location for configuration files, logs, shared files, caches, etc.
+        Initializes and returns a platformdirs.PlatformDirs instance.
+
+        Provides appropriate platform-specific application directories (e.g., OS-standard
+        location for configuration files, logs, shared files, caches, etc.).
         See platformdirs documentation for more details: https://github.com/tox-dev/platformdirs
 
-        platformdirs doesn't offer a way to get Unix-like directories on macOS which may not be always desired. So,
-        ProperPath.platformdirs offers an additional argument "follow_unix" which is False by default. If "follow_unix" is True,
-        ProperPath.platformdirs will return an instance that follows Unix-like directory structure for both macOS and
-        Linux-based operating systems. Windows paths will not be altered.
+        platformdirs doesn't offer a way to get Unix-like directories on macOS which may not
+        be always desired. So, ProperPath.platformdirs offers an additional argument
+        "follow_unix" which is False by default. If "follow_unix" is True,
+        ProperPath.platformdirs will return an instance that follows Unix-like directory
+        structure for both macOS and Linux-based operating systems. Windows paths will not
+        be altered.
 
-        Any other arguments and keyword arguments passed to this method will be passed to the
-        platformdirs.PlatformDirs as is. Examples::
+
+        Examples:
 
             app_dirs = ProperPath.platformdirs("MyApp", "MyOrg")
             app_dirs.user_data_dir
@@ -105,40 +110,27 @@ class ProperPath(Path):
             dirs.user_config_dir
             # Returns ProperPath('/Users/user/Library/Application Support/MyApp/1.0')
 
+        Args:
+            appname (Optional[str]): The name of the app author or distributing body for this application.
+            appauthor (str | Literal[False] | None): Typically, it is the owning company name. Defaults to `appname`.
+                You may pass ``False`` to disable it.
+            version (Optional[str]): An optional version path element to append to the path.
+                You might want to use this if you want multiple versions of your app to be
+                able to run independently. If used, this would typically be ``<major>.<minor>``.
+            roaming (bool): Whether to use the roaming appdata directory on Windows.
+                That means that for users on a Windows network setup for roaming profiles,
+                this user data will be synced on login.
+                See: https://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
+            multipath (bool): An optional parameter which indicates that the entire list of data
+                dirs should be returned. By default, the first item would only be returned.
+            opinion (bool): A flag to indicating to use opinionated values.
+            ensure_exists (bool): Optionally create the directory (and any missing parents) upon
+                access if it does not exist. By default, no directories are created.
+            follow_unix (bool): Specifies whether to enforce a Unix-like directory structure
+                for both macOS and Linux. Defaults to False.
 
-        :param follow_unix: Specifies whether to enforce a Unix-like directory structure
-            for both macOS and Linux. Defaults to False.
-
-        :param appname: The name of the app author or distributing body for this application.
-        :type appname: Optional[str]
-
-        :param appauthor: Typically, it is the owning company name. Defaults to `appname`.
-            You may pass ``False`` to disable it.
-        :type appauthor: str | Literal[False] | None
-
-        :param version: An optional version path element to append to the path.
-        You might want to use this if you want multiple versions of your app to be able to run independently. If used,
-        this would typically be ``<major>.<minor>``.
-        :type version: Optional[str]
-
-        :param roaming: Whether to use the roaming appdata directory on Windows.
-        That means that for users on a Windows network setup for roaming profiles, this user data will be synced on
-        login (see `here <https://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx>`_).
-        :type roaming: bool
-
-        :param multipath: An optional parameter which indicates that the entire list of data dirs should be returned.
-            By default, the first item would only be returned.
-        :type multipath: bool
-
-        :param opinion: A flag to indicating to use opinionated values.
-        :type opinion: bool
-
-        :param ensure_exists: Optionally create the directory (and any missing parents) upon access if it does not exist.
-            By default, no directories are created.
-        :type ensure_exists: bool
-
-        :return: An instance of the appropriate platform directory handler (PlatformDirs)
-        :rtype: ProperPlatformDirs
+        Returns:
+            PlatformDirs: An instance of the appropriate platform directory handler
         """
 
         dirs: ProperPlatformDirs | ProperUnix
@@ -183,7 +175,8 @@ class ProperPath(Path):
 
     def __repr__(self):
         """
-        :return: An information-rich representation of the ProperPath instance.
+        Returns:
+            str: An information-rich representation of the ProperPath instance.
         """
         return (
             f"{self.__class__.__name__}(path={self}, actual={self.actual}, "
@@ -200,8 +193,8 @@ class ProperPath(Path):
         as a namedtuple. The __deepcopy__ method is overridden to avoid that. Notice, only instance attributes are
         deepcopied, not properties.
 
-        :param memo:
-        :return:
+        Args:
+            memo:
         """
         memo[id(self)] = result = type(self).__new__(type(self))
         for k, v in self.__dict__.items():
@@ -215,18 +208,19 @@ class ProperPath(Path):
         return ProperPath(self._expanded / other, err_logger=self.err_logger)
 
     @property
-    def actual(self) -> str:
+    def actual(self) -> Iterable[str]:
         """
         Provides access to the user-given path (or path segments) that was passed to the constructor of the
         ProperPath instance. ProperPath by default expands any user indicator "~"
         automatically and uses the expanded path internally. The actual will show the non-expanded value.
-        E.g.::
+
+        Examples:
 
             ProperPath("~", "foo").actual
             # Returns ("~", "foo")
 
-        :return: The path value
-        :rtype: str
+        Returns:
+            Iterable[str]: The path value
         """
         return self._actual
 
@@ -235,16 +229,14 @@ class ProperPath(Path):
         segments = []
         for segment in value:
             if isinstance(
-                segment, ProperPath
+                segment, (ProperPath, Path)
             ):  # We want to be able to pass a ProperPath() to ProperPath()
-                value = segment.actual
-            if isinstance(value, Path):
-                value = str(segment)
+                segment = str(segment)
                 # If this isn't handled this way for Path instances,
                 # weird issues like "AttributeError: object has
                 # no attribute '_raw_paths'. Did you mean: '_raw_path'?" can happen.
-            segments.append(value)
-        self._actual = value
+            segments.append(segment)
+        self._actual = tuple(segments)
 
     @property
     def err_logger(self):
@@ -252,8 +244,8 @@ class ProperPath(Path):
         Provides access to the error logger that is used for logging exceptions.
         The default logger is ProperPath.default_err_logger.
 
-        :return: The error logger instance.
-        :rtype: Logger
+        Returns:
+            Logger: The error logger instance.
         """
         return self._err_logger
 
@@ -274,7 +266,9 @@ class ProperPath(Path):
         PathException property stores an exception (like OSException) raised for the working path instance,
         before the exception is raised normally. In some ways, PathException treats
         errors/exceptions as values. PathException can be used to create design patterns where one path failing,
-        doesn't matter, but any path from a list of available paths can be used for the user. Example::
+        doesn't matter, but any path from a list of available paths can be used for the user.
+
+        Example:
 
             # Storing data to a file of from a list of fallback file paths:
             path_exceptions = []
@@ -295,9 +289,8 @@ class ProperPath(Path):
                 path.err_logger.error(f"Couldn't write to any of the fallback paths. Exceptions: {path_exceptions}")
                 raise path.PathException
 
-
-        :return: The exception thrown for the working path instance.
-        :rtype: type[Exception] | type[BaseException]
+        Returns:
+            type[Exception] | type[BaseException]: The exception thrown for the working path instance.
         """
         return self._PathException
 
@@ -334,8 +327,8 @@ class ProperPath(Path):
         If the path exists, kind already knows what kind it is. If the path doesn't exist, kind tries to assume the kind from
         file suffixes. Kind can also handle special files like /dev/null. kind is set during instance creation.
 
-        :return: "file" or "dir" depending on the path.
-        :rtype: Literal["file", "dir"]
+        Returns:
+            Literal["file", "dir"]: "file" or "dir" depending on the path.
         """
 
         # noinspection PyTypeChecker
@@ -382,16 +375,20 @@ class ProperPath(Path):
         or "path.is_dir()". For files and directories, it ensures the parent directory exists
         before creating the file. Logs operations and exceptions for debugging.
 
-        :param verbose: If True, debug logs will be generated to trace creation
-            attempts for files and directories.
-        :type verbose: bool
-        :return: None
-        :raises PermissionError: If the operation lacks permission to create the file
-            or directory.
-        :raises NotADirectoryError: If the operation attempts to create a directory
-            under a path that is incorrectly treated as a non-directory.
-        :raises OSError: If an OS-level error (all others excluding PermissionError and
-            NotADirectoryError) occurs during the creation process.
+        Args:
+            verbose (bool): If True, debug logs will be generated to trace creation
+                attempts for files and directories.
+
+        Raises:
+            PermissionError: If the operation lacks permission to create the file
+                or directory.
+            NotADirectoryError: If the operation attempts to create a directory
+                under a path that is incorrectly treated as a non-directory.
+            OSError: If an OS-level error (all others excluding PermissionError and
+                NotADirectoryError) occurs during the creation process.
+
+        Returns:
+            None
         """
         path = super().resolve(strict=False)
         try:
@@ -480,11 +477,13 @@ class ProperPath(Path):
         while keeping the parent directory intact. If `parent_only` is False, all contents are
         removed recursively. Verbose can be set to True (default) to log the removal.
 
-        :param parent_only: A boolean flag indicating whether only the immediate children of the
+        Args:
+            parent_only (bool): A boolean flag indicating whether only the immediate children of the
             directory should be removed, leaving the parent directory intact. Defaults to False.
-        :param verbose: A boolean flag indicating whether detailed logs of the removal operations
+            verbose (bool): A boolean flag indicating whether detailed logs of the removal operations
             should be printed or logged. Defaults to True.
-        :return: None
+        Returns:
+            None
         """
         # removes everything (if parent_only is False) found inside a ProperPath except the parent directory of the path
         # if the ProperPath isn't a directory, then it just removes the file
@@ -510,8 +509,8 @@ class ProperPath(Path):
 
     def open(self, mode="r", encoding=None, *args, **kwargs):
         """
-        ProperPath open instance method simply returns pathlib.Path.open.
-        open() resolves the whole path first before opening.
+        ProperPath open first resolves the whole path and then simply returns pathlib.Path.open.
+        This method is mainly overloaded to log exceptions.
         """
         file = super().resolve()
         try:
