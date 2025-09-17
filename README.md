@@ -24,14 +24,32 @@ tools/applications. `ProperPath` was originally created for [elAPI](https://gith
 Make sure your Python virtual environment is activated. `properpath` requires Python 3.12 and above. Install
 `properpath` with `pip`.
 
-```shell linenums="0"
+```shell
 pip install properpath
 ```
 
 You can install with `uv` as well.
 
-```shell linenums="0"
+```shell
 uv add properpath
+```
+
+## Quickstart
+
+Open a Python REPL and try the following:
+
+```pycon
+>>> from properpath import ProperPath
+
+>>> ProperPath("~")
+ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+```
+
+If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
+adventurous (!), you can try the following:
+
+```python
+from properpath import ProperPath as Path
 ```
 
 ## Usage
