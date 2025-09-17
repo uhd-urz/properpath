@@ -1,8 +1,8 @@
 # ProperPath
 
-<a href="#compatibility">
-   <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
-   <img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
+<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
+<a href="https://github.com/uhd-urz/properpath/actions">
+<img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
 </a>
 
 An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
@@ -11,6 +11,30 @@ extra features. The added features/APIs are mainly aimed at improving developer 
 tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
 <img height="312" width="670" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
+
+## Main Features in a Nutshell
+
+1. A drop-in `pathlib.Path` replacement with more descriptive REPL representation
+2. Built-in error logging for raised exceptions
+3. Simplified APIs for working with files and directories
+4. Better [`platformfirs`](https://github.com/tox-dev/platformdirs) integration
+5. Validation for file/directory write permission
+
+
+## Installation
+
+Make sure your Python virtual environment is activated. `properpath` requires Python 3.12 and above. Install
+`properpath` with `pip`.
+
+```shell linenums="0"
+pip install properpath
+```
+
+You can install with `uv` as well.
+
+```shell linenums="0"
+uv add properpath
+```
 
 ## Usage
 

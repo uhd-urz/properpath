@@ -1,7 +1,13 @@
 site_name: ProperPath Documentation
-site_url: https://mydomain.org/mysite
+site_url: https://uhd-urz.github.io/properpath/
 repo_url: https://github.com/uhd-urz/properpath
 repo_name: uhd-urz/properpath
+nav:
+  - Introduction: 'index.md'
+  - Tutorial: 'tutorial.md'
+  - API Reference:
+      - ProperPath: 'apis/properpath.md'
+      - Path Validators: 'apis/validators.md'
 theme:
   name: material
   palette:
@@ -61,7 +67,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [src]
+          paths: [ src ]
       options:
         allow_inspection: true
         docstring_style: "google"
