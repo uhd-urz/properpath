@@ -1,0 +1,3 @@
+# ProperPath
+
+::: properpath.ProperPath

@@ -23,6 +23,14 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "mkdocs-material>=9.6.20",
+    "mkdocstrings[python]>=0.30.0",
     "pytest>=8.4.2",
     "ruff>=0.13.0",
+]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    "tests/extra_test",
 ]
