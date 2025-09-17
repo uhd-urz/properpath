@@ -1,7 +1,6 @@
 # ProperPath
 
-<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
-<a href="https://github.com/uhd-urz/properpath/actions">
+<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe"> <a href="https://github.com/uhd-urz/properpath/actions"> 
 <img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
 </a>
 
@@ -19,7 +18,6 @@ tools/applications. `ProperPath` was originally created for [elAPI](https://gith
 3. Simplified APIs for working with files and directories
 4. Better [`platformfirs`](https://github.com/tox-dev/platformdirs) integration
 5. Validation for file/directory write permission
-
 
 ## Installation
 
@@ -45,7 +43,7 @@ supports [all the methods and attributes](https://docs.python.org/3.12/library/p
 `pathlib.Path`. We can pass a `pathlib.Path` instance or a string path or multiple path segments or `os.path` values to
 `ProperPath`.
 
-```python
+```pycon
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
@@ -59,9 +57,9 @@ ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=T
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
-`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` **always expands the username** (`~`) segment by default. 
+`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` *
+*always expands the username** (`~`) segment by default.
 A `ProperPath` instance can also be passed to `pathlib.Path` or `os.path` methods.
-
 
 ### Is a `file` or a `dir`?
 
@@ -69,7 +67,7 @@ A `ProperPath` instance stores whether the path is a file or a directory in the 
 exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
-```python
+```pycon
 >>> p = ProperPath("~/foo.txt")
 >>> p.exists()
 False
@@ -90,9 +88,10 @@ future operations. This can help catch unexpected errors. An example: Let's cons
 **file** named `foo` to exist in user's `~/Downloads` folder. But for whatever reason, a directory with the exact the
 same name already exists in `~/Downloads`. If we want to create the file with
 `pathlib.Path("~/Downloads/foo").expanduser().touch(exist_ok=True)`, the method will succeed, and we will have assumed a
-_file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and throw an error.
+_file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and
+throw an error.
 
-```python
+```pycon
 >>> q = ProperPath("~/Downloads", "foo", kind="file")
 ProperPath(path=/Users/username/Downloads/foo, actual=('/Users/username/Downloads/foo',), kind=file, exists=True, err_logger=<RootLogger root (WARNING)>)
 >>> q.create()
@@ -107,10 +106,12 @@ IsADirectoryError: File was expected but a directory with the same name was foun
 
 ### Built-in error logging
 
-A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that path instance. If no
-logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python root logger).
+A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that
+path instance. If no
+logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python
+root logger).
 
-```python
+```pycon
 >>> import logging
 >>> logging.basicConfig(level=logging.DEBUG)
 >>> p = ProperPath("/var/log/my_app.log")
@@ -145,9 +146,11 @@ Just call `create` on any path to create it. If the path already exists, nothing
 ProperPath("/etc/my_app/config.toml").create()
 ```
 
-Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is empty
+Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is
+empty
 or not. If the path is a directory, everything inside it will be removed recursively by default. `remove` method accepts
-a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the files,
+a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the
+files,
 will not do a recursion into other directories).
 
 ```text
@@ -173,10 +176,11 @@ the hood both `create` and `remove` methods take advantage of the `kind` attribu
 paths: [platformdirs](https://github.com/tox-dev/platformdirs). E.g., to get OS-standard locations for configuration
 files, logs, caches, etc. See
 platformdirs [documentation](https://github.com/tox-dev/platformdirs?tab=readme-ov-file#platformdirs-for-convenience)
-for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
+for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But
+with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
-```python
+```pycon
 >>> from properpath import ProperPath
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
@@ -200,7 +204,7 @@ Platformdirs enforces a strict directory structure for macOS, but many tools out
 structures on macOS as well. `ProperPath` provides an additional `follow_unix` argument to `ProperPath.platformdirs`
 that will enforce Unix-style directory structure on macOS, but will leave Windows as is.
 
-```python
+```pycon
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
 ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
@@ -270,4 +274,6 @@ and [fixed subclassing](https://docs.python.org/3/whatsnew/3.12.html#summary-rel
 
 ## Credits
 
-The banner art was taken from this [stock photo](https://www.pexels.com/photo/aerial-view-of-road-in-the-middle-of-trees-1173777/), and was transformed into a pixel art with AI.
+The banner art was taken from
+this [stock photo](https://www.pexels.com/photo/aerial-view-of-road-in-the-middle-of-trees-1173777/), and was
+transformed into a pixel art with AI.

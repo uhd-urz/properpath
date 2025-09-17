@@ -1,7 +1,6 @@
 # Getting Started
 
-<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
-<a href="https://github.com/uhd-urz/properpath/actions">
+<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe"> <a href="https://github.com/uhd-urz/properpath/actions"> 
 <img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
 </a>
 
@@ -42,7 +41,7 @@ uv add properpath
 
 Open a Python REPL and try the following:
 
-```{ .python .no-copy title="Python REPL" linenums="0" }
+```{ .pycon .no-copy title="Python REPL" linenums="0" }
 >>> from properpath import ProperPath
 
 >>> ProperPath("~")
