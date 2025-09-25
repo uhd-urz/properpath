@@ -332,8 +332,9 @@ class ProperPath(Path):
         """
         Retrieves the path kind: a "file" or a "dir".
         If the path exists, kind already knows what kind it is. If the path doesn't exist, kind tries to assume the kind from
-        file suffixes. Kind can also handle special files like `/dev/null`. An expected/future `kind` can be passed to the
-        constructor during instance creation.
+        file suffixes. Kind can also handle special files like `/dev/null`. A `kind` value ('file' or 'dir') can also be
+        manually passed to the constructor during instance creation or be set later. The user-modified `kind` is treated as the
+        user expected `kind`.
 
         Returns:
             (Literal["file", "dir"]): "file" or "dir" depending on the path.

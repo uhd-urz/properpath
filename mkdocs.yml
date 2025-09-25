@@ -6,8 +6,8 @@ nav:
   - Introduction: 'index.md'
   - Tutorial: 'tutorial.md'
   - API Reference:
-      - ProperPath: 'apis/properpath.md'
-      - Path Validators: 'apis/validators.md'
+      - 'apis/properpath.md'
+      - 'apis/validators.md'
 theme:
   name: material
   palette:
@@ -34,6 +34,7 @@ theme:
     - navigation.path
     - search.suggest
     - content.code.copy
+    - navigation.sections
 
 extra_css:
   - stylesheets/extra.css
@@ -48,6 +49,12 @@ extra:
     - icon: fontawesome/solid/globe
       link: https://www.urz.uni-heidelberg.de/en
       name: Website
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/urz-rechenzentrum-der-universit%C3%A4t-heidelberg/about/
+      name: LinkedIn
+    - icon: fontawesome/brands/mastodon
+      link: https://xn--baw-joa.social/@uniheidelbergIT
+      name: Mastodon
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -67,7 +74,12 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [ src ]
+          paths: [src]
+          options:
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
       options:
         allow_inspection: true
         docstring_style: "google"
+copyright: ProperPath package is copyrighted under the MIT license.

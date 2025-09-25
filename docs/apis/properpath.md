@@ -1,3 +1,3 @@
-# ProperPath
+# `ProperPath` 
 
-::: properpath.ProperPath
+::: properpath
