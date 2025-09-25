@@ -62,6 +62,7 @@ class ProperPath(Path):
                 If `None`, the class instance default_err_logger is used.
         """
 
+        self._user_expects_kind: bool
         self._kind: Literal["file", "dir"] | None
         self.actual = actual
         super().__init__(self._expanded)
@@ -337,7 +338,7 @@ class ProperPath(Path):
         Returns:
             (Literal["file", "dir"]): "file" or "dir" depending on the path.
         """
-        if self._kind is None:
+        if self._kind is None or self._user_expects_kind is False:
             self._kind = (
                 "dir"
                 if super().is_dir()
@@ -347,13 +348,13 @@ class ProperPath(Path):
                 # since is_file() doesn't consider /dev/null to be a file!
                 else "dir"
             )
-        # noinspection PyTypeChecker
         return self._kind
 
     @kind.setter
     def kind(self, value) -> None:
         if value is None:
             self._kind = None
+            self._user_expects_kind = False
         else:
             match value.lower():
                 case "file":
@@ -365,6 +366,7 @@ class ProperPath(Path):
                         f"Invalid value '{value}' for parameter 'kind'. The following values "
                         "for 'kind' are allowed: file, dir."
                     )
+            self._user_expects_kind = True
 
     @staticmethod
     def _error_helper_compare_path_source(
@@ -508,22 +510,31 @@ class ProperPath(Path):
         if self.kind == "file":
             self._remove_file(verbose=verbose)
         elif self.kind == "dir":
+            ls_ref: Iterable[Path]
             ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
-            for ref in ls_ref:
-                match ProperPath(ref).kind:
-                    case "file":
-                        self._remove_file(_file=ref, verbose=verbose)
-                        # Either FileNotFoundError and PermissionError occurring can mean that
-                        # a dir path was passed when its kind is set as "file"
-                    case "dir" if not parent_only:
-                        rmtree(ref)
-                        self.err_logger.debug(
-                            f"Deleted directory (recursively): {ref}"
-                        ) if verbose else ...
-                        # rmtree deletes files and directories recursively.
-                        # So in case of permission error with rmtree(ref),
-                        # shutil.rmtree() might give better
-                        # traceback message. I.e., which file or directory exactly
+            ls_ref = list(ls_ref)
+            if ls_ref:
+                for ref in ls_ref:
+                    match ProperPath(ref).kind:
+                        case "file":
+                            self._remove_file(_file=ref, verbose=verbose)
+                            # Either FileNotFoundError and PermissionError occurring can mean that
+                            # a dir path was passed when its kind is set as "file"
+                        case "dir" if not parent_only:
+                            rmtree(ref)
+                            self.err_logger.debug(
+                                f"Deleted directory (recursively): {ref}"
+                            ) if verbose else ...
+                            # rmtree deletes files and directories recursively.
+                            # So in case of permission error with rmtree(ref),
+                            # shutil.rmtree() might give better
+                            # traceback message. I.e., which file or directory exactly
+            else:
+                if not parent_only:
+                    super().rmdir()
+                    self.err_logger.debug(
+                        f"Deleted empty directory: {self._expanded}"
+                    ) if verbose else ...
 
     def open(self, mode="r", encoding=None, *args, **kwargs):
         """
