@@ -194,13 +194,20 @@ class ProperPath(Path):
     def __deepcopy__(self, memo):
         """
         `ProperPath`, likely due to being a victim of inheritance hell, can throw odd errors when it is deepcopied
-        as a namedtuple. The `__deepcopy__` method is overridden to avoid that. Notice, only instance attributes are
-        deepcopied, not properties.
+        as a namedtuple. The `__deepcopy__` method is overridden to avoid that.
+
+        Note:
+            If you're getting `AttributeError: 'properpath.properpath.ProperPath' object has no attribute '_raw_paths'.
+            Did you mean: '_raw_path'?`, it likely has something to do with `__deepcopy__` even if
+            it doesn't show up in the traceback.
 
         Args:
             memo:
         """
         memo[id(self)] = result = type(self).__new__(type(self))
+        self.__dict__["kind"] = self.kind
+        # Although kind is a property, and _kind already exists in __dict__,
+        # without this explicit set, __deepcopy__ can throw odd errors.
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result

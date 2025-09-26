@@ -1,6 +1,6 @@
 [project]
 name = "properpath"
-version = "0.2.3"
+version = "0.2.4"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 readme = "README.md"

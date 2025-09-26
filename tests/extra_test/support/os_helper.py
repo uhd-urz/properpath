@@ -10,7 +10,7 @@ import time
 import unittest
 import warnings
 
-from test import support
+from extra_test import support
 
 
 # Filename used for testing
