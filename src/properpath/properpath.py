@@ -516,13 +516,16 @@ class ProperPath(Path):
             ls_ref = list(ls_ref)
             if ls_ref:
                 for ref in ls_ref:
-                    match ProperPath(ref).kind:
-                        case "file":
+                    match (ref_path := ProperPath(ref)).kind:
+                        case "file" if ref_path.exists():
                             self._remove_file(_file=ref, verbose=verbose)
                             # Either FileNotFoundError and PermissionError occurring can mean that
                             # a dir path was passed when its kind is set as "file"
-                        case "dir" if not parent_only:
+                        case "dir" if not parent_only and ref_path.exists():
                             rmtree(ref)
+                            # A subdir can delete files inside first, but ls_ref will still have old
+                            # (already copied from ls_ref generator) files/folders,
+                            # hence the ref_path.exists() check to avoid repeated deletions.
                             self.err_logger.debug(
                                 f"Deleted directory (recursively): {ref}"
                             ) if verbose else ...
