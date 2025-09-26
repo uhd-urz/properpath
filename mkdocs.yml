@@ -56,6 +56,8 @@ extra:
       link: https://xn--baw-joa.social/@uniheidelbergIT
       name: Mastodon
 markdown_extensions:
+  - toc:
+      permalink: true
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -74,7 +76,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [src]
+          paths: [ src ]
           options:
             members_order: source
             separate_signature: true
