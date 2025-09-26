@@ -12,7 +12,7 @@ import unittest
 from unittest import mock
 
 import properpath
-from test.support import (
+from extra_test.support import (
     is_emscripten,
     os_helper,
     set_recursion_limit,
