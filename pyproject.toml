@@ -1,6 +1,6 @@
 [project]
 name = "properpath"
-version = "0.2.1"
+version = "0.2.2"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 
@@ -9,7 +9,7 @@ requires-python = ">=3.12"
 dependencies = [
     "platformdirs>=4.4.0,<4.5.0",
 ]
-license = "AGPL-3.0-only"
+license = "MIT"
 keywords = [
     "path",
 ]
@@ -23,6 +23,14 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "mkdocs-material>=9.6.20",
+    "mkdocstrings[python]>=0.30.0",
     "pytest>=8.4.2",
     "ruff>=0.13.0",
+]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    "tests/extra_test",
 ]

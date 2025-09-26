@@ -1,0 +1,3 @@
+# Path Validators
+
+::: properpath.validators

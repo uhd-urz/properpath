@@ -1,67 +1,13 @@
-# ProperPath
+# Tutorial
 
-<img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe"> <a href="https://github.com/uhd-urz/properpath/actions"> 
-<img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
-</a>
-
-An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
-`pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement with some
-extra features. The added features/APIs are mainly aimed at improving developer experience in building CLI
-tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
-
-<img height="312" width="670" src="https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1" alt="properpath on the road" />
-
-## Main Features in a Nutshell
-
-1. A drop-in `pathlib.Path` replacement with more descriptive REPL representation
-2. Built-in error logging for raised exceptions
-3. Simplified APIs for working with files and directories
-4. Better [`platformfirs`](https://github.com/tox-dev/platformdirs) integration
-5. Validation for file/directory write permission
-
-## Installation
-
-Make sure your Python virtual environment is activated. `properpath` requires Python 3.12 and above. Install
-`properpath` with `pip`.
-
-```shell
-pip install properpath
-```
-
-You can install with `uv` as well.
-
-```shell
-uv add properpath
-```
-
-## Quickstart
-
-Open a Python REPL and try the following:
-
-```pycon
->>> from properpath import ProperPath
-
->>> ProperPath("~")
-ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
-```
-
-If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
-adventurous (!), you can try the following:
-
-```python
-from properpath import ProperPath as Path
-```
-
-## Usage
-
-### Drop-in `pathlib.Path` replacement
+## Drop-in `pathlib.Path` replacement
 
 Since `ProperPath` is a subclass of `pathlib.Path` it
 supports [all the methods and attributes](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path) supported by
 `pathlib.Path`. We can pass a `pathlib.Path` instance or a string path or multiple path segments or `os.path` values to
 `ProperPath`.
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" linenums="0" hl_lines="4" }
 
 >>> from properpath import ProperPath
 >>> p = ProperPath("~/foo")
@@ -75,17 +21,23 @@ ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=T
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
-`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` *
-*always expands the username** (`~`) segment by default.
+`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` **always expands the username** (`~`) segment by default. 
 A `ProperPath` instance can also be passed to `pathlib.Path` or `os.path` methods.
 
-### Is a `file` or a `dir`?
+```{ .pycon .no-copy title="Python REPL" linenums="0" }
+>>> from pathlib import Path
+
+>>> Path(ProperPath("~"))
+PosixPath('/Users/username')
+```
+
+## Is a `file` or a `dir`?
 
 A `ProperPath` instance stores whether the path is a file or a directory in the `kind` attribute. If the path doesn't
 exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" linenums="0" }
 >>> p = ProperPath("~/foo.txt")
 >>> p.exists()
 False
@@ -110,7 +62,7 @@ same name already exists in `~/Downloads`. If we want to create the file with
 `pathlib.Path("~/Downloads/foo").expanduser().touch(exist_ok=True)`, the method will succeed, and we will have assumed a
 _file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and throw an error.
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" linenums="0" hl_lines="1 10" }
 >>> q = ProperPath("~/Downloads", "foo", kind="file")
 ProperPath(path=/Users/username/Downloads/foo, actual=('/Users/username/Downloads/foo',), kind=file, exists=True, err_logger=<RootLogger root (WARNING)>)
 >>> q.create()
@@ -120,17 +72,15 @@ Traceback (most recent call last):
     raise e
   File "/Users/username/Workshop/properpath/src/properpath/properpath.py", line 421, in create
     raise is_a_dir_exception(message)
-IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/culdesac/Downloads from SOURCE=('~/Downloads', 'foo').
+IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/username/Downloads from SOURCE=('~/Downloads', 'foo').
 ```
 
-### Built-in error logging
+## Built-in error logging
 
-A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that
-path instance. If no
-logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python
-root logger).
+A custom logger can be passed to `ProperPath` instance. This logger will be used throughout path operations for that path instance. If no
+logger is passed, `ProperPath` will use `ProperPath.default_err_logger` class attribute (which by default is the Python root logger).
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" hl_lines="7 8" linenums="0"}
 >>> import logging
 >>> logging.basicConfig(level=logging.DEBUG)
 >>> p = ProperPath("/var/log/my_app.log")
@@ -147,15 +97,19 @@ Traceback (most recent call last):
 # before being raised.
 ```
 
-**Note:** All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
-to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
-debugging/development. We can also pass our own custom logger to
+!!! note
+
+    All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
+    to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
+    debugging/development. 
+
+We can also pass our own custom logger to
 `ProperPath("/var/log/my_app.log", err_logger=logging.getLogger("my_logger"))`, or modify the `err_logger` attribute at
 runtime. Each logger is tied to the instance it was passed to. If we want to have a single logger to be shared with all
 instances of `ProperPath`, we just set the class attribute
 `ProperPath.default_err_logger = logging.getLogger("my_logger")`.
 
-### `create` and `remove` paths
+## `create` and `remove` paths
 
 To create a new file or directory, `pathlib.Path` would require a boilerplate `if path.is_file():` or
 `if path.is_dir():` block if the path is unknown. `ProperPath` provides the `create` method that simplifies this step.
@@ -165,14 +119,12 @@ Just call `create` on any path to create it. If the path already exists, nothing
 ProperPath("/etc/my_app/config.toml").create()
 ```
 
-Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is
-empty
+Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is empty
 or not. If the path is a directory, everything inside it will be removed recursively by default. `remove` method accepts
-a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the
-files,
+a `parent_only` argument, which if `True`, will only remove the top-level contents only (i.e., will remove only the files,
 will not do a recursion into other directories).
 
-```text
+```text linenums="0"
 .local/
 ├─ share/
 │  ├─ my_app/
@@ -189,17 +141,16 @@ The code above will only `~/.local/share/my_app/config.toml`, and leave `custom/
 `parents_only=False` is passed (the default), everything inside `my_app` directory will be deleted recursively. Under
 the hood both `create` and `remove` methods take advantage of the `kind` attribute.
 
-### Better Platformdirs
+## Better Platformdirs
 
 `ProperPath` comes integrated with a popular library used for managing common application
 paths: [platformdirs](https://github.com/tox-dev/platformdirs). E.g., to get OS-standard locations for configuration
 files, logs, caches, etc. See
 platformdirs [documentation](https://github.com/tox-dev/platformdirs?tab=readme-ov-file#platformdirs-for-convenience)
-for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But
-with `ProperPath.platformdirs`, you can get
+for more details and examples for **other operating systems**. Values from `platformdirs` by default are strings. But with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" linenums="0" hl_lines="3 5 7 9 11 13 15" }
 >>> from properpath import ProperPath
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
@@ -223,7 +174,7 @@ Platformdirs enforces a strict directory structure for macOS, but many tools out
 structures on macOS as well. `ProperPath` provides an additional `follow_unix` argument to `ProperPath.platformdirs`
 that will enforce Unix-style directory structure on macOS, but will leave Windows as is.
 
-```pycon
+```{ .pycon .no-copy title="Python REPL" linenums="0" hl_lines="2 4 6 8 10 12 14" }
 >>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
 ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
@@ -241,14 +192,14 @@ ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',)
 ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
 ```
 
-### Path validation
+## Path validation
 
 We often write to files, so we need to make sure if the file we're writing to is even _writable_; i.e., if the file
 exists, if there is enough storage space, if there is sufficient permission, etc. `ProperPath` comes with a
 `PathWriteValidator` class that can be used to do exactly that. Example: we want to write to a file from a list of
 fallback files, and we want to write to the first one that works.
 
-```python
+```python title="validate.py"
 from properpath.validators import PathValidationError, PathWriteValidator
 
 user_desired_paths = ["/usr/usb/Downloads/", "~/Downloads"]
@@ -269,7 +220,8 @@ words, an error raised for a path is tied to that path only. We can use this `Pa
 mechanism. I.e., if we want to just forget about the error from one path, and move onto the next path. From one of our
 previous examples:
 
-```python
+```python title="try_path_exception.py"
+
 p = ProperPath("~/Downloads/metadata.txt")
 
 try:
@@ -283,16 +235,3 @@ except p.PathException as e:
 ```
 
 In some ways, `PathException` treats errors as values.
-
-## Why is the Python compatibility 3.12 and above?
-
-Before Python 3.12, subclassing `pathlib.Path` was tricky and riddled with odd bugs even when done so carefully. In
-fact, composition, and not inheritance, was the best option to extend `pathlib.Path` until Python 3.12.
-Python 3.12 addressed this issue
-and [fixed subclassing](https://docs.python.org/3/whatsnew/3.12.html#summary-release-highlights) for `pathlib.Path`.
-
-## Credits
-
-The banner art was taken from
-this [stock photo](https://www.pexels.com/photo/aerial-view-of-road-in-the-middle-of-trees-1173777/), and was
-transformed into a pixel art with AI.
