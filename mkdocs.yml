@@ -79,7 +79,6 @@ plugins:
             members_order: source
             separate_signature: true
             show_signature_annotations: true
-      options:
-        allow_inspection: true
-        docstring_style: "google"
+            allow_inspection: true
+            docstring_style: "google"
 copyright: ProperPath package is copyrighted under the MIT license.
