@@ -1,5 +1,7 @@
 # ProperPath
 
+<a href="https://pypi.org/project/properpath">
+<img alt="Package version" src="https://badge.fury.io/py/properpath.svg/?branch=main" /></a>
 <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe"> <a href="https://github.com/uhd-urz/properpath/actions"> 
 <img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg">
 </a>
@@ -99,16 +101,19 @@ True
 ```
 
 In this code block though we could just use `is_dir()`. The real power of `kind` comes though, when we're working with
-files/directories that aren't strictly created or handled by us, but we know what `kind` we are expecting. When `kind` attribute is modified by the user, 
-the `kind` is treated as the user-expected `kind`. When `kind` is not user-modified, `ProperPath` determines the appropriate `kind`. 
+files/directories that aren't strictly created or handled by us, but we know what `kind` we are expecting. When `kind`
+attribute is modified by the user,
+the `kind` is treated as the user-expected `kind`. When `kind` is not user-modified, `ProperPath` determines the
+appropriate `kind`.
 We can pass the expected `kind` as an argument to the
 constructor during the path instance creation. Pure `ProperPath` operations will expect that `kind` for that for all
-future operations. This can help catch unexpected errors or even prevent unexpected file operation. 
+future operations. This can help catch unexpected errors or even prevent unexpected file operation.
 An example: Let's consider a situation where we expect a
 **file** named `foo` to exist in user's `~/Downloads` folder. But for whatever reason, a directory with the exact the
 same name already exists in `~/Downloads`. If we want to create the file with
 `pathlib.Path("~/Downloads/foo").expanduser().touch(exist_ok=True)`, the method will succeed, and we will have assumed a
-_file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and throw an error.
+_file_ was indeed created! `ProperPath`'s `create` method will use `kind` to find out the mismatch in expectation, and
+throw an error.
 
 ```pycon
 >>> q = ProperPath("~/Downloads", "foo", kind="file")
