@@ -204,13 +204,12 @@ class ProperPath(Path):
         Args:
             memo:
         """
-        memo[id(self)] = result = type(self).__new__(type(self))
-        self.__dict__["kind"] = self.kind
-        # Although kind is a property, and _kind already exists in __dict__,
-        # without this explicit set, __deepcopy__ can throw odd errors.
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
-        return result
+        if memo_instance := memo.get(id(self)):
+            return memo_instance
+        instance = self.__class__(self)
+        memo[id(self)] = instance
+        instance.__dict__.update(deepcopy(self.__dict__, memo))
+        return instance
 
     def __eq__(self, to):
         return super().__eq__(to)
