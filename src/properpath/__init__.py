@@ -1,3 +1,3 @@
-from .properpath import NoException, ProperPath
+from .properpath import NoException, P, ProperPath
 
-__all__ = ["ProperPath", "NoException"]
+__all__ = ["ProperPath", "NoException", "P"]
