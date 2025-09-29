@@ -41,17 +41,17 @@ uv add properpath
 Open a Python REPL and try the following:
 
 ```{ .pycon .no-copy title="Python REPL" linenums="0" }
->>> from properpath import ProperPath
+>>> from properpath import P # "P" is a shorthand for "ProperPath"
 
->>> ProperPath("~")
-ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> P("~")
+ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
 If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
 adventurous (!), you can try the following:
 
 ```python
-from properpath import ProperPath as Path
+from properpath import P as Path
 ```
 
 Head over to the [Tutorial](tutorial.md) page for more hands-on examples.

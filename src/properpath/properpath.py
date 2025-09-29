@@ -573,3 +573,6 @@ class ProperPath(Path):
             )
             self.PathException = os_exception
             raise e
+
+
+P = ProperPath

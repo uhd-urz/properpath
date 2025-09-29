@@ -39,20 +39,26 @@ uv add properpath
 Open a Python REPL and try the following:
 
 ```pycon
->>> from properpath import ProperPath
+>>> from properpath import P # "P" is a shorthand for "ProperPath"
 
->>> ProperPath("~")
-ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> P("~")
+ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
 If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
 adventurous (!), you can try the following:
 
 ```python
-from properpath import ProperPath as Path
+from properpath import P as Path
 ```
 
 ## Usage
+
+> [!TIP]
+> In the examples below, we will use the shorthand `P`: `from properpath import P`, instead of
+`from properpath import ProperPath`, where `P == ProperPath`.
+> That is because `P` is much shorter and easier to type, and makes working with paths on the REPL
+> more enjoyable.
 
 ### Drop-in `pathlib.Path` replacement
 
@@ -63,15 +69,14 @@ supports [all the methods and attributes](https://docs.python.org/3.12/library/p
 
 ```pycon
 
->>> from properpath import ProperPath
->>> p = ProperPath("~/foo")
+>>> from properpath import P
+>>> p = P("~/foo")
 >>> p
-ProperPath(path=/Users/username/foo, actual=~/foo, kind=dir, err_logger=<RootLogger
-root(WARNING)>)
+ProperPath(path=/Users/username/foo, actual=('~/foo',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> isinstance(p, pathlib.Path)
 True
->>> ProperPath.home()  # pathlib.Path's method
-ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> P.home()  # pathlib.Path's method
+ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
@@ -86,12 +91,12 @@ exist beforehand, `PropePath` will try to assume it from the path's extension.
 `ProperPath` also knows how to handle special files like `/dev/null`.
 
 ```pycon
->>> p = ProperPath("~/foo.txt")
+>>> p = P("~/foo.txt")
 >>> p.exists()
 False
 >>> p.kind  # Kind is determined from the file extension.
 'file'
->>> p = ProperPath("~/foo")
+>>> p = P("~/foo")
 >>> p.exists()
 True
 >>> p.kind
@@ -114,8 +119,8 @@ _file_ was indeed created! `ProperPath`'s `create` method will use `kind` to fin
 throw an error.
 
 ```pycon
->>> q = ProperPath("~/Downloads", "foo", kind="file")
-ProperPath(path=/Users/username/Downloads/foo, actual=('/Users/username/Downloads/foo',), kind=file, exists=True, err_logger=<RootLogger root (WARNING)>)
+>>> q = P("~/Downloads", "foo", kind="file")
+ProperPath(path=/Users/username/Downloads/foo, actual=('/Users/username/Downloads/foo',), kind=file, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> q.create()
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -123,7 +128,7 @@ Traceback (most recent call last):
     raise e
   File "/Users/username/Workshop/properpath/src/properpath/properpath.py", line 421, in create
     raise is_a_dir_exception(message)
-IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/culdesac/Downloads from SOURCE=('~/Downloads', 'foo').
+IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/username/Downloads from SOURCE=('~/Downloads', 'foo').
 ```
 
 ### Built-in error logging
@@ -150,13 +155,14 @@ Traceback (most recent call last):
 # before being raised.
 ```
 
-**Note:** All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
-to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
-debugging/development. We can also pass our own custom logger to
-`ProperPath("/var/log/my_app.log", err_logger=logging.getLogger("my_logger"))`, or modify the `err_logger` attribute at
-runtime. Each logger is tied to the instance it was passed to. If we want to have a single logger to be shared with all
-instances of `ProperPath`, we just set the class attribute
-`ProperPath.default_err_logger = logging.getLogger("my_logger")`.
+> [!NOTE]
+> All log messages are logged as `DEBUG` messages. So the default logging level or handler level should be set
+> to `DEBUG`. This is so that path logs don't overwhelm the regular users, and the `DEBUG` level is only set for
+> debugging/development. We can also pass our own custom logger to
+`P("/var/log/my_app.log", err_logger=logging.getLogger("my_logger"))`, or modify the `err_logger` attribute at
+> runtime. Each logger is tied to the instance it was passed to. If we want to have a single logger to be shared with
+> all instances of `ProperPath`, we just set the class attribute
+`P.default_err_logger = logging.getLogger("my_logger")`.
 
 ### `create` and `remove` paths
 
@@ -185,7 +191,7 @@ will not do a recursion into other directories).
 ```
 
 ```python
-ProperPath("~/.local/share/my_app/").remove(parent_only=True)
+P("~/.local/share/my_app/").remove(parent_only=True)
 ```
 
 The code above will only `~/.local/share/my_app/config.toml`, and leave `custom/` and `plugins/` directories as is. If
@@ -203,22 +209,22 @@ with `ProperPath.platformdirs`, you can get
 `ProperPath` instances instead.
 
 ```pycon
->>> from properpath import ProperPath
->>> app_dirs = ProperPath.platformdirs("my_app", "my_org")
+>>> from properpath import P
+>>> app_dirs = P.platformdirs("my_app", "my_org")
 >>> app_dirs.user_config_dir
-ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_data_dir
-ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Application Support/my_app, actual=('/Users/username/Library/Application Support/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_cache_dir
-ProperPath(path=/Users/username/Library/Caches/my_app, actual=('/Users/username/Library/Caches/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Library/Caches/my_app, actual=('/Users/username/Library/Caches/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_data_dir
-ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_config_dir
-ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Library/Application Support/my_app, actual=('/Library/Application Support/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_documents_dir
-ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_downloads_dir
-ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>>  # Etc. See whole list: https://github.com/tox-dev/platformdirs?tab=readme-ov-file#platformdirs-for-convenience
 ```
 
@@ -227,21 +233,21 @@ structures on macOS as well. `ProperPath` provides an additional `follow_unix` a
 that will enforce Unix-style directory structure on macOS, but will leave Windows as is.
 
 ```pycon
->>> app_dirs = ProperPath.platformdirs("my_app", "my_org", follow_unix=True)
+>>> app_dirs = P.platformdirs("my_app", "my_org", follow_unix=True)
 >>> app_dirs.user_config_dir
-ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.config/my_app, actual=('/Users/username/.config/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_data_dir
-ProperPath(path=/Users/username/.local/share/my_app, actual=('/Users/username/.local/share/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.local/share/my_app, actual=('/Users/username/.local/share/my_app',), kind=dir, is_symlink=False, exists=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_cache_dir
-ProperPath(path=/Users/username/.cache/my_app, actual=('/Users/username/.cache/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/.cache/my_app, actual=('/Users/username/.cache/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_data_dir
-ProperPath(path=/usr/local/share/my_app, actual=('/usr/local/share/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/usr/local/share/my_app, actual=('/usr/local/share/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.site_config_dir
-ProperPath(path=/etc/xdg/my_app, actual=('/etc/xdg/my_app',), kind=dir, exists=False, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/etc/xdg/my_app, actual=('/etc/xdg/my_app',), kind=dir, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_documents_dir
-ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Documents, actual=('/Users/username/Documents',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 >>> app_dirs.user_downloads_dir
-ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
+ProperPath(path=/Users/username/Downloads, actual=('/Users/username/Downloads',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
 ### Path validation
@@ -273,7 +279,7 @@ mechanism. I.e., if we want to just forget about the error from one path, and mo
 previous examples:
 
 ```python
-p = ProperPath("~/Downloads/metadata.txt")
+p = P("~/Downloads/metadata.txt")
 
 try:
     with p.open("w") as f:
@@ -282,7 +288,7 @@ except p.PathException as e:
     # try a different path
     p.err_logger.warning(f"Failed to write to {p}. Exception: {e!r}")
     p.err_logger.info("Trying another path...")
-    ProperPath("~/metadata.txt").write_text("Hello, world!")
+    P("~/metadata.txt").write_text("Hello, world!")
 ```
 
 In some ways, `PathException` treats errors as values.
