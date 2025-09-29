@@ -103,13 +103,15 @@ True
 'dir'
 ```
 
-In this code block though we could just use `is_dir()`. The real power of `kind` comes though, when we're working with
+In this code block though we could just use `is_dir()`. The real power of `kind` comes when we're working with
 files/directories that aren't strictly created or handled by us, but we know what `kind` we are expecting. When `kind`
-attribute is modified by the user,
-the `kind` is treated as the user-expected `kind`. When `kind` is not user-modified, `ProperPath` determines the
+attribute is modified by the developer,
+the `kind` is treated as the developer-expected `kind`. When `kind` is not modified, `ProperPath` determines the
 appropriate `kind`.
-We can pass the expected `kind` as an argument to the
-constructor during the path instance creation. Pure `ProperPath` operations will expect that `kind` for that for all
+We can modify `kind` by passing it as an argument to the
+constructor during the path instance creation, or later on by simply updating the value of the attribute
+`p.kind = "<file or dir>"`.
+Pure `ProperPath` operations will expect that `kind` for all
 future operations. This can help catch unexpected errors or even prevent unexpected file operation.
 An example: Let's consider a situation where we expect a
 **file** named `foo` to exist in user's `~/Downloads` folder. But for whatever reason, a directory with the exact the
@@ -130,6 +132,14 @@ Traceback (most recent call last):
     raise is_a_dir_exception(message)
 IsADirectoryError: File was expected but a directory with the same name was found: PATH=/Users/username/Downloads from SOURCE=('~/Downloads', 'foo').
 ```
+
+> [!TIP]
+> In short, when we don't modify the `kind` attribute, `kind` simply gives the path's [
+`is_file()`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path.is_file) or [
+`is_dir()`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path.is_dir) status. When
+> we do modify the attribute, our modified `kind` is cached, and is treated as the _expected `kind`_ for all future
+> operations. When this expected `kind` doesn't match the actual `kind` of the path in the system for whatever reason,
+`ProperPath` will attempt to throw an error before irrecoverable operations like deleting files.
 
 ### Built-in error logging
 
