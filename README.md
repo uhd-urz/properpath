@@ -80,8 +80,8 @@ ProperPath(path=/Users/username, actual=('/Users/username',), kind=dir, exists=T
 ```
 
 `ProperPath` shows more information about the path on the REPL (or a [
-`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath` *
-*always expands the username** (`~`) segment by default.
+`repr` call](https://docs.python.org/3/library/functions.html#repr) from inside a script). Notice, how `ProperPath`
+**always expands the username** (`~`) segment by default.
 A `ProperPath` instance can also be passed to `pathlib.Path` or `os.path` methods.
 
 ### Is a `file` or a `dir`?
