@@ -184,7 +184,7 @@ class ProperPath(Path):
         """
         return (
             f"{self.__class__.__name__}(path={self}, actual={self.actual}, "
-            f"kind={self.kind}, exists={self.exists()}, "
+            f"kind={self.kind}, exists={self.exists()}, is_symlink={self.is_symlink()}, "
             f"err_logger={self.err_logger})"
         )
 
