@@ -151,7 +151,7 @@ root logger).
 ```pycon
 >>> import logging
 >>> logging.basicConfig(level=logging.DEBUG)
->>> p = ProperPath("/var/log/my_app.log")
+>>> p = P("/var/log/my_app.log")
 >>> with p.open("w") as f:
 ...     f.write("Hello, world!")
 ...
@@ -181,7 +181,7 @@ To create a new file or directory, `pathlib.Path` would require a boilerplate `i
 Just call `create` on any path to create it. If the path already exists, nothing happens.
 
 ```python
-ProperPath("/etc/my_app/config.toml").create()
+P("/etc/my_app/config.toml").create()
 ```
 
 Similarly, the `remove` removes the need to boilerplate check for if the path is a file or a directory, or if it is
