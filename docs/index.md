@@ -3,6 +3,7 @@
 <a href="https://pypi.org/project/properpath"><img alt="Package version" src="https://badge.fury.io/py/properpath.svg/?branch=main" /></a>
 <img alt="Static Badge" src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-%230d7dbe">
 <a href="https://github.com/uhd-urz/properpath/actions"><img alt="GitHub Action test workflow" src="https://github.com/uhd-urz/properpath/actions/workflows/test.yml/badge.svg"></a>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An opinionated OS-path module for people who take paths too seriously. `ProperPath`, as a subclass of Python's popular [
 `pathlib.Path`](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path), is a drop-in replacement with some
