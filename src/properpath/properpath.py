@@ -215,6 +215,18 @@ class ProperPath(Path):
             f"err_logger={self.err_logger})"
         )
 
+    def __rich_repr__(self):
+        """
+        Enables rich __repr__ support.
+        See [rich REPR protocol documentation](https://rich.readthedocs.io/en/latest/pretty.html#rich-repr-protocol).
+        """
+        yield "path", str(self)
+        yield "actual", self.actual
+        yield "kind", self.kind
+        yield "exists", self.exists()
+        yield "is_symlink", self.is_symlink()
+        yield "err_logger", self.err_logger
+
     def __hash__(self):
         return super().__hash__()
 
