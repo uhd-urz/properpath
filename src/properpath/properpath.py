@@ -3,9 +3,36 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 from shutil import rmtree
-from typing import Iterable, Literal, Optional, Self, Union
+from typing import Any, Iterable, Literal, Optional, Self, Union
 
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
+
+try:
+    from pydantic_core import core_schema
+except ImportError:
+    ...
+else:
+
+    def _get_pydantic_core_schema(
+        cls, source_type: Any, handler: Any
+    ) -> core_schema.CoreSchema:
+        from_string_validator = core_schema.no_info_plain_validator_function(cls)
+        python_schema = core_schema.union_schema(
+            [
+                core_schema.is_instance_schema(cls),
+                core_schema.chain_schema(
+                    [core_schema.str_schema(), from_string_validator]
+                ),
+            ],
+            serialization=core_schema.plain_serializer_function_ser_schema(str),
+        )
+        json_schema = core_schema.chain_schema(
+            [core_schema.str_schema(), from_string_validator],
+            serialization=core_schema.plain_serializer_function_ser_schema(str),
+        )
+        return core_schema.json_or_python_schema(
+            json_schema=json_schema, python_schema=python_schema
+        )
 
 
 class NoException(Exception):
@@ -210,6 +237,14 @@ class ProperPath(Path):
         memo[id(self)] = instance
         instance.__dict__.update(deepcopy(self.__dict__, memo))
         return instance
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any):
+        """
+        Enables Pydantic validation support.
+        See [Pydantic documentation](https://docs.pydantic.dev/latest/concepts/types/#customizing-validation-with-__get_pydantic_core_schema__).
+        """
+        return _get_pydantic_core_schema(cls, source_type, handler)
 
     def __eq__(self, to):
         return super().__eq__(to)
