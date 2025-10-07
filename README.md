@@ -19,6 +19,8 @@ tools/applications. `ProperPath` was originally created for [elAPI](https://gith
 3. Simplified APIs for working with files and directories
 4. Better [`platformfirs`](https://github.com/tox-dev/platformdirs) integration
 5. Validation for file/directory write permission
+6. Support for [Pydantic](https://docs.pydantic.dev/latest/) validation
+   and [Rich](https://rich.readthedocs.io/en/stable/) pretty-repr printing
 
 ## Installation
 
@@ -46,8 +48,8 @@ Open a Python REPL and try the following:
 ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
-If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
-adventurous (!), you can try the following:
+There's also [Pydantic and Rich-pretty-printing](#integrations) support. If you already have a script or a project
+where you've used `from pathlib import Path`, and if you're feeling adventurous (!), try the following:
 
 ```python
 from properpath import P as Path
@@ -297,12 +299,51 @@ try:
         f.write("Hello, world!")
 except p.PathException as e:
     # try a different path
-    p.err_logger.warning(f"Failed to write to {p}. Exception: {e!r}")
+    p.err_logger.warning(f"Failed to write to {p}. OS-error code: {e.errno}. Exception: {e!r}")
     p.err_logger.info("Trying another path...")
     P("~/metadata.txt").write_text("Hello, world!")
 ```
 
 In some ways, `PathException` treats errors as values.
+
+## Integrations
+
+### Working with Pydantic
+
+`ProperPath` can be used with [Pydantic](https://pydantic-docs.helpmanual.io/) models or fields the same way
+[`pathlib.Path` can be](https://docs.pydantic.dev/latest/api/standard_library_types/#pathlibpath).
+
+```python title="try_with_pydantic.py"
+from pydantic import BaseModel
+
+from properpath import P
+
+
+class ConfigSource(BaseModel):
+    local_path: P
+    system_path: P
+
+
+config_source = ConfigSource(
+    local_path="~/.config/app.toml", system_path="/etc/app.toml"
+)
+print(config_source)
+# Prints: ConfigSource(local_path=ProperPath(path=/Users/culdesac/.config/app.toml, actual=('~/.config/app.toml',), kind=file, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>), system_path=ProperPath(path=/etc/app.toml, actual=('/etc/app.toml',), kind=file, exists=False, is_symlink=False, err_logger=<RootLogger root (WARNING)>))
+```
+
+### Rich pretty-printing in REPL
+
+If [`rich`](https://github.com/Textualize/rich) is installed (can optionally be installed with `properpath[rich]`),
+`ProperPath` instances will be pretty-printed in REPL. Make sure `from rich import pretty; pretty.install()` is run in
+the REPL beforehand, or added to the [`PYTHONSTARTUP`](https://www.bitecode.dev/p/happiness-is-a-good-pythonstartup)
+script.
+
+```pycon
+>>> from rich import pretty; pretty.install()
+>>> config_source  # from the example before 
+```
+
+<img height="500" width="507" src="docs/assets/rich_pretty_repr_dark_opt.png" alt="properpath rich pretty repr screenshot dark" />
 
 ## Why is the Python compatibility 3.12 and above?
 

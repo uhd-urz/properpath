@@ -3,9 +3,44 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 from shutil import rmtree
-from typing import Iterable, Literal, Optional, Self, Union
+from typing import Any, Iterable, Literal, Optional, Self, Union
 
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
+
+try:
+    # noinspection PyUnusedImports
+    from pydantic_core import core_schema
+except ImportError as import_error:
+    error = import_error
+
+    # noinspection PyUnusedLocal
+    def _get_pydantic_core_schema(cls, source_type: Any, handler: Any):
+        raise NotImplementedError(
+            f"pydantic must be installed for "
+            f"{_get_pydantic_core_schema.__name__} to work."
+        ) from error
+else:
+    # noinspection PyUnusedLocal
+    def _get_pydantic_core_schema(
+        cls, source_type: Any, handler: Any
+    ) -> core_schema.CoreSchema:
+        from_string_validator = core_schema.no_info_plain_validator_function(cls)
+        python_schema = core_schema.union_schema(
+            [
+                core_schema.is_instance_schema(cls),
+                core_schema.chain_schema(
+                    [core_schema.str_schema(), from_string_validator]
+                ),
+            ],
+            serialization=core_schema.plain_serializer_function_ser_schema(str),
+        )
+        json_schema = core_schema.chain_schema(
+            [core_schema.str_schema(), from_string_validator],
+            serialization=core_schema.plain_serializer_function_ser_schema(str),
+        )
+        return core_schema.json_or_python_schema(
+            json_schema=json_schema, python_schema=python_schema
+        )
 
 
 class NoException(Exception):
@@ -17,7 +52,7 @@ class NoException(Exception):
 
 class ProperPath(Path):
     """
-    A `pathlib.Path` subclass that is a drop-in replacement for `pathlib.Path` module.
+    A `pathlib.Path` subclass that is a drop-in replacement for the `pathlib.Path` module.
 
     `ProperPath` provides additional features such as custom logging for errors,
     automatic user expansion, information-rich repr, and the ability to create and remove
@@ -91,7 +126,7 @@ class ProperPath(Path):
 
         platformdirs doesn't offer a way to get Unix-like directories on macOS which may not
         be always desired. So, `ProperPath.platformdirs` offers an additional argument
-        `follow_unix` which is False by default. If `follow_unix` is True,
+        `follow_unix`, which is False by default. If `follow_unix` is True,
         `ProperPath.platformdirs` will return an instance that follows a Unix-like directory
         structure for both macOS and Linux-based operating systems. Windows paths will not
         be altered.
@@ -188,6 +223,18 @@ class ProperPath(Path):
             f"err_logger={self.err_logger})"
         )
 
+    def __rich_repr__(self):
+        """
+        Enables rich __repr__ support.
+        See [rich REPR protocol documentation](https://rich.readthedocs.io/en/latest/pretty.html#rich-repr-protocol).
+        """
+        yield "path", str(self)
+        yield "actual", self.actual
+        yield "kind", self.kind
+        yield "exists", self.exists()
+        yield "is_symlink", self.is_symlink()
+        yield "err_logger", self.err_logger
+
     def __hash__(self):
         return super().__hash__()
 
@@ -210,6 +257,14 @@ class ProperPath(Path):
         memo[id(self)] = instance
         instance.__dict__.update(deepcopy(self.__dict__, memo))
         return instance
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any):
+        """
+        Enables Pydantic validation support.
+        See [Pydantic documentation](https://docs.pydantic.dev/latest/concepts/types/#customizing-validation-with-__get_pydantic_core_schema__).
+        """
+        return _get_pydantic_core_schema(cls, source_type, handler)
 
     def __eq__(self, to):
         return super().__eq__(to)
@@ -514,37 +569,40 @@ class ProperPath(Path):
         """
         # removes everything (if parent_only is False) found inside a ProperPath except the parent directory of the path
         # if the ProperPath isn't a directory, then it just removes the file
-        if self.kind == "file":
-            self._remove_file(verbose=verbose)
-        elif self.kind == "dir":
-            ls_ref: Iterable[Path]
-            ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
-            ls_ref = list(ls_ref)
-            if ls_ref:
-                for ref in ls_ref:
-                    match (ref_path := ProperPath(ref)).kind:
-                        case "file" if ref_path.exists():
-                            self._remove_file(_file=ref, verbose=verbose)
-                            # Either FileNotFoundError and PermissionError occurring can mean that
-                            # a dir path was passed when its kind is set as "file"
-                        case "dir" if not parent_only and ref_path.exists():
-                            rmtree(ref)
-                            # A subdir can delete files inside first, but ls_ref will still have old
-                            # (already copied from ls_ref generator) files/folders,
-                            # hence the ref_path.exists() check to avoid repeated deletions.
-                            self.err_logger.debug(
-                                f"Deleted directory (recursively): {ref}"
-                            ) if verbose else ...
-                            # rmtree deletes files and directories recursively.
-                            # So in case of permission error with rmtree(ref),
-                            # shutil.rmtree() might give better
-                            # traceback message. I.e., which file or directory exactly
-            else:
-                if not parent_only:
-                    super().rmdir()
-                    self.err_logger.debug(
-                        f"Deleted empty directory: {self._expanded}"
-                    ) if verbose else ...
+        match self.kind:
+            case "file":
+                self._remove_file(verbose=verbose)
+            case "dir":
+                ls_ref: Iterable[Path]
+                ls_ref = (
+                    super().glob(r"**/*") if not parent_only else super().glob(r"*")
+                )
+                ls_ref = list(ls_ref)
+                if ls_ref:
+                    for ref in ls_ref:
+                        match (ref_path := ProperPath(ref)).kind:
+                            case "file" if ref_path.exists():
+                                self._remove_file(_file=ref, verbose=verbose)
+                                # Either FileNotFoundError and PermissionError occurring can mean that
+                                # a dir path was passed when its kind is set as "file"
+                            case "dir" if not parent_only and ref_path.exists():
+                                rmtree(ref)
+                                # A subdir can delete files inside first, but ls_ref will still have old
+                                # (already copied from ls_ref generator) files/folders,
+                                # hence the ref_path.exists() check to avoid repeated deletions.
+                                self.err_logger.debug(
+                                    f"Deleted directory (recursively): {ref}"
+                                ) if verbose else ...
+                                # rmtree deletes files and directories recursively.
+                                # So in case of permission error with rmtree(ref),
+                                # shutil.rmtree() might give better
+                                # traceback message. I.e., which file or directory exactly
+                else:
+                    if not parent_only:
+                        super().rmdir()
+                        self.err_logger.debug(
+                            f"Deleted empty directory: {self._expanded}"
+                        ) if verbose else ...
 
     def open(self, mode="r", encoding=None, *args, **kwargs):
         """

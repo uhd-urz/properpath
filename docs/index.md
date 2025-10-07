@@ -21,6 +21,8 @@ tools/applications. `ProperPath` was originally created for [elAPI](https://gith
 3. Simplified APIs for working with files and directories
 4. Better [`platformfirs`](https://github.com/tox-dev/platformdirs) integration
 5. Validation for file/directory write permission
+6. Support for [Pydantic](https://docs.pydantic.dev/latest/) validation
+   and [Rich](https://rich.readthedocs.io/en/stable/) pretty-repr printing
 
 ## Installation
 
@@ -48,8 +50,8 @@ Open a Python REPL and try the following:
 ProperPath(path=/Users/username, actual=('~',), kind=dir, exists=True, is_symlink=False, err_logger=<RootLogger root (WARNING)>)
 ```
 
-If you already have a script or a project where you've used `from pathlib import Path`, and if you're feeling
-adventurous (!), you can try the following:
+There's also [Pydantic and Rich-pretty-printing](integrations.md) support. If you already have a script or a project
+where you've used `from pathlib import Path`, and if you're feeling adventurous (!), try the following:
 
 ```python
 from properpath import P as Path

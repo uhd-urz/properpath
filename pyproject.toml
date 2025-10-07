@@ -1,6 +1,6 @@
 [project]
 name = "properpath"
-version = "0.2.6"
+version = "0.2.7"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 readme = "README.md"
@@ -30,6 +30,14 @@ Repository = "https://github.com/uhd-urz/properpath"
 Issues = "https://github.com/uhd-urz/properpath/issues"
 Changelog = "https://github.com/uhd-urz/properpath/blob/main/CHANGELOG.md"
 
+[project.optional-dependencies]
+pydantic = [
+    "pydantic>=2.11.0,<2.13.0",
+]
+rich = [
+    "rich>=14.0,<14.2.0",
+]
+
 [tool.uv.build-backend]
 module-name = "properpath"
 module-root = "src"
@@ -40,10 +48,11 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "mkdocs-material>=9.6.20",
-    "mkdocstrings[python]>=0.30.0",
-    "pytest>=8.4.2",
-    "ruff>=0.13.0",
+    "mkdocs-material>=9.6.20,<9.7",
+    "mkdocstrings[python]>=0.30.0,<0.31",
+    "pytest>=8.4.2, <8.5",
+    "rich>=14.1.0, <15.0",
+    "ruff>=0.13.0,<0.14",
 ]
 
 [tool.ruff]
