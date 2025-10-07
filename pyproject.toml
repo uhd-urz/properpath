@@ -32,7 +32,10 @@ Changelog = "https://github.com/uhd-urz/properpath/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 pydantic = [
-    "pydantic>=2.11.10,<3.0",
+    "pydantic>=2.11.0,<2.13.0",
+]
+rich = [
+    "rich>=14.0,<14.2.0",
 ]
 
 [tool.uv.build-backend]
