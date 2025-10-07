@@ -5,6 +5,7 @@ repo_name: uhd-urz/properpath
 nav:
   - Introduction: 'index.md'
   - Tutorial: 'tutorial.md'
+  - Integrations: "integrations.md"
   - API Reference:
       - 'apis/properpath.md'
       - 'apis/validators.md'

@@ -254,7 +254,7 @@ try:
         f.write("Hello, world!")
 except p.PathException as e:
     # try a different path
-    p.err_logger.warning(f"Failed to write to {p}. Exception: {e!r}")
+    p.err_logger.warning(f"Failed to write to {p}. OS-error code: {e.errno}. Exception: {e!r}")
     p.err_logger.info("Trying another path...")
     P("~/metadata.txt").write_text("Hello, world!")
 ```
