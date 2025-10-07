@@ -9,8 +9,14 @@ from .platformdirs_ import ProperPlatformDirs, ProperUnix
 
 try:
     from pydantic_core import core_schema
-except ImportError:
-    ...
+except ImportError as e:
+
+    def _get_pydantic_core_schema(cls, source_type: Any, handler: Any):
+        global e
+        raise NotImplementedError(
+            f"pydantic must be installed for "
+            f"{_get_pydantic_core_schema.__name__} to work."
+        ) from e
 else:
 
     def _get_pydantic_core_schema(
@@ -561,37 +567,38 @@ class ProperPath(Path):
         """
         # removes everything (if parent_only is False) found inside a ProperPath except the parent directory of the path
         # if the ProperPath isn't a directory, then it just removes the file
-        if self.kind == "file":
-            self._remove_file(verbose=verbose)
-        elif self.kind == "dir":
-            ls_ref: Iterable[Path]
-            ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
-            ls_ref = list(ls_ref)
-            if ls_ref:
-                for ref in ls_ref:
-                    match (ref_path := ProperPath(ref)).kind:
-                        case "file" if ref_path.exists():
-                            self._remove_file(_file=ref, verbose=verbose)
-                            # Either FileNotFoundError and PermissionError occurring can mean that
-                            # a dir path was passed when its kind is set as "file"
-                        case "dir" if not parent_only and ref_path.exists():
-                            rmtree(ref)
-                            # A subdir can delete files inside first, but ls_ref will still have old
-                            # (already copied from ls_ref generator) files/folders,
-                            # hence the ref_path.exists() check to avoid repeated deletions.
-                            self.err_logger.debug(
-                                f"Deleted directory (recursively): {ref}"
-                            ) if verbose else ...
-                            # rmtree deletes files and directories recursively.
-                            # So in case of permission error with rmtree(ref),
-                            # shutil.rmtree() might give better
-                            # traceback message. I.e., which file or directory exactly
-            else:
-                if not parent_only:
-                    super().rmdir()
-                    self.err_logger.debug(
-                        f"Deleted empty directory: {self._expanded}"
-                    ) if verbose else ...
+        match self.kind:
+            case "file":
+                self._remove_file(verbose=verbose)
+            case "dir":
+                ls_ref: Iterable[Path]
+                ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
+                ls_ref = list(ls_ref)
+                if ls_ref:
+                    for ref in ls_ref:
+                        match (ref_path := ProperPath(ref)).kind:
+                            case "file" if ref_path.exists():
+                                self._remove_file(_file=ref, verbose=verbose)
+                                # Either FileNotFoundError and PermissionError occurring can mean that
+                                # a dir path was passed when its kind is set as "file"
+                            case "dir" if not parent_only and ref_path.exists():
+                                rmtree(ref)
+                                # A subdir can delete files inside first, but ls_ref will still have old
+                                # (already copied from ls_ref generator) files/folders,
+                                # hence the ref_path.exists() check to avoid repeated deletions.
+                                self.err_logger.debug(
+                                    f"Deleted directory (recursively): {ref}"
+                                ) if verbose else ...
+                                # rmtree deletes files and directories recursively.
+                                # So in case of permission error with rmtree(ref),
+                                # shutil.rmtree() might give better
+                                # traceback message. I.e., which file or directory exactly
+                else:
+                    if not parent_only:
+                        super().rmdir()
+                        self.err_logger.debug(
+                            f"Deleted empty directory: {self._expanded}"
+                        ) if verbose else ...
 
     def open(self, mode="r", encoding=None, *args, **kwargs):
         """
