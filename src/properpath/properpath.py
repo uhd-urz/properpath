@@ -8,17 +8,19 @@ from typing import Any, Iterable, Literal, Optional, Self, Union
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
 
 try:
+    # noinspection PyUnusedImports
     from pydantic_core import core_schema
-except ImportError as e:
+except ImportError as import_error:
+    error = import_error
 
+    # noinspection PyUnusedLocal
     def _get_pydantic_core_schema(cls, source_type: Any, handler: Any):
-        global e
         raise NotImplementedError(
             f"pydantic must be installed for "
             f"{_get_pydantic_core_schema.__name__} to work."
-        ) from e
+        ) from error
 else:
-
+    # noinspection PyUnusedLocal
     def _get_pydantic_core_schema(
         cls, source_type: Any, handler: Any
     ) -> core_schema.CoreSchema:
@@ -50,7 +52,7 @@ class NoException(Exception):
 
 class ProperPath(Path):
     """
-    A `pathlib.Path` subclass that is a drop-in replacement for `pathlib.Path` module.
+    A `pathlib.Path` subclass that is a drop-in replacement for the `pathlib.Path` module.
 
     `ProperPath` provides additional features such as custom logging for errors,
     automatic user expansion, information-rich repr, and the ability to create and remove
@@ -124,7 +126,7 @@ class ProperPath(Path):
 
         platformdirs doesn't offer a way to get Unix-like directories on macOS which may not
         be always desired. So, `ProperPath.platformdirs` offers an additional argument
-        `follow_unix` which is False by default. If `follow_unix` is True,
+        `follow_unix`, which is False by default. If `follow_unix` is True,
         `ProperPath.platformdirs` will return an instance that follows a Unix-like directory
         structure for both macOS and Linux-based operating systems. Windows paths will not
         be altered.
@@ -572,7 +574,9 @@ class ProperPath(Path):
                 self._remove_file(verbose=verbose)
             case "dir":
                 ls_ref: Iterable[Path]
-                ls_ref = super().glob(r"**/*") if not parent_only else super().glob(r"*")
+                ls_ref = (
+                    super().glob(r"**/*") if not parent_only else super().glob(r"*")
+                )
                 ls_ref = list(ls_ref)
                 if ls_ref:
                     for ref in ls_ref:
