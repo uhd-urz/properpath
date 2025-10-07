@@ -343,7 +343,7 @@ script.
 >>> config_source  # from the example before 
 ```
 
-<img height="500" width="507" src="docs/assets/rich_pretty_repr_dark_opt.png" alt="properpath rich pretty repr screenshot dark" />
+<img height="500" width="507" src="https://raw.githubusercontent.com/uhd-urz/properpath/refs/heads/main/docs/assets/rich_pretty_repr_dark_opt.png" alt="properpath rich pretty repr screenshot dark" />
 
 ## Why is the Python compatibility 3.12 and above?
 
