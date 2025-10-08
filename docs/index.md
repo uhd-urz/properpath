@@ -10,8 +10,8 @@ An opinionated OS-path module for people who take paths too seriously. `ProperPa
 extra features. The added features/APIs are mainly aimed at improving developer experience in building CLI
 tools/applications. `ProperPath` was originally created for [elAPI](https://github.com/uhd-urz/elAPI).
 
-![properpath on the road](https://heibox.uni-heidelberg.de/f/5f8e95d5a5954d3a88c8/?dl=1#only-light){ height="312" width="670" }
-![properpath on the road](https://heibox.uni-heidelberg.de/f/548e9c6a7e6e4c7cbc07/?dl=1#only-dark){ height="312" width="670" }
+![properpath on the road](https://raw.githubusercontent.com/uhd-urz/properpath/refs/heads/main/docs/assets/python_on_the_road.jpg#only-light){ height="312" width="670" }
+![properpath on the road](https://raw.githubusercontent.com/uhd-urz/properpath/refs/heads/main/docs/assets/python_on_the_road_dark.jpg#only-dark){ height="312" width="670" }
 
 
 ## Main Features in a Nutshell
