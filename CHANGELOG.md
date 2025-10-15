@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] - 2025-10-16
+
+Release with minor features.
+
+### Added
+
+- Added [`get_text`](https://uhd-urz.github.io/properpath/apis/properpath/#properpath.ProperPath.get_text) and
+  [`get_bytes`](https://uhd-urz.github.io/properpath/apis/properpath/#properpath.ProperPath.get_bytes) methods
+
+### Changed
+
+- Avoid resolving the path in `open` method
+
+## [0.2.7] - 2025-10-09
+
+This release adds Pydantic support and Rich pretty REPL printing support to ProperPath. 2 additional optional
+dependencies have been added: `properpath[pydantic]`,` properpath[rich]`.
+
 ## [0.2.6] - 2025-09-29
 
 Release with minor improvements.
