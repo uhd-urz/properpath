@@ -609,7 +609,7 @@ class ProperPath(Path):
         ProperPath open first resolves the whole path and then simply returns pathlib.Path.open.
         This method is mainly overloaded to log exceptions.
         """
-        file = super().resolve()
+        file = self._expanded
         try:
             return Path(file).open(
                 mode=mode,
@@ -631,6 +631,66 @@ class ProperPath(Path):
             )
             self.PathException = os_exception
             raise e
+
+    # noinspection PyIncorrectDocstring
+    def get_text(
+        self,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+        newline: Optional[str] = None,
+        default: Optional[str] = None,
+    ) -> Optional[str]:
+        """
+        `get_text` method is basically [`read_text`](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.read_text)
+        with support for extra `defaults` parameter. `get_text` passes optional arguments `encoding`, `errors`, `newline` to
+        `read_text`.
+
+        Args:
+            encoding: The same meaning as the `encoding` argument for method
+                [`open`](https://docs.python.org/3.13/library/functions.html#open).
+            errors: The same meaning as the `encoding` argument for method
+                [`open`](https://docs.python.org/3.13/library/functions.html#open).
+            newline: The same meaning as the `encoding` argument for method
+                [`open`](https://docs.python.org/3.13/library/functions.html#open).
+                `newline` is only supported in Python 3.13 and above.
+            default:
+                If the file does not exist, then `default` is returned. By default, `default` is `None`.
+
+        Example:
+            ```python
+            import json
+            from properpath import P
+
+            cache = json.loads(P("~/.cache/app/cache.json").get_text(encoding="utf-8", default='{}'))
+            ```
+
+        Returns:
+            The decoded contents of the pointed-to file as a string or default (when file does not exist).
+        """
+        try:
+            if sys.version_info.minor >= 13:
+                return super().read_text(encoding, errors, newline)
+            return super().read_text(encoding, errors)
+        except FileNotFoundError:
+            return default
+
+    # noinspection PyIncorrectDocstring
+    def get_bytes(self, default: Optional[bytes] = None) -> Optional[bytes]:
+        """
+        `get_bytes` method is basically [`read_bytes`](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.read_bytes)
+        with support for extra `defaults` parameter.
+
+        Args:
+            default:
+                If the file does not exist, then `default` is returned. By default, `default` is `None`.
+
+        Returns:
+            The binary contents of the pointed-to file as a bytes object or default (when file does not exist).
+        """
+        try:
+            return super().read_bytes()
+        except FileNotFoundError:
+            return default
 
 
 P = ProperPath
