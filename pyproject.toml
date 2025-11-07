@@ -1,13 +1,13 @@
 [project]
 name = "properpath"
-version = "0.2.8"
+version = "0.2.9"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 readme = "README.md"
 description = "A pathlib.Path drop-in replacement with extra features. "
 requires-python = ">=3.12"
 dependencies = [
-    "platformdirs>=4.4.0,<4.5.0",
+    "platformdirs>=4.4.0,<4.6.0",
 ]
 license = "MIT"
 keywords = [
@@ -35,7 +35,7 @@ pydantic = [
     "pydantic>=2.11.0,<2.13.0",
 ]
 rich = [
-    "rich>=14.0,<14.2.0",
+    "rich>=14.0,<14.3.0",
 ]
 
 [tool.uv.build-backend]
@@ -50,9 +50,9 @@ build-backend = "uv_build"
 dev = [
     "mkdocs-material>=9.6.20,<9.7",
     "mkdocstrings[python]>=0.30.0,<0.31",
+    "mypy>=1.18.2",
     "pytest>=8.4.2, <8.5",
-    "rich>=14.1.0, <15.0",
-    "ruff>=0.13.0,<0.14",
+    "ruff>=0.13.0,<0.15",
 ]
 
 [tool.ruff]
@@ -60,3 +60,8 @@ dev = [
 exclude = [
     "tests/extra_test",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# F821 is ignored so ruff doesn't complain about
+# ProperPath not being found in platfordirs_.py
+"src/properpath/platformdirs_.py" = ["F821"]

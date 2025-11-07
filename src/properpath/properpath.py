@@ -9,20 +9,27 @@ from .platformdirs_ import ProperPlatformDirs, ProperUnix
 
 try:
     # noinspection PyUnusedImports
+    from pydantic import GetCoreSchemaHandler
+
+    # noinspection PyUnusedImports
     from pydantic_core import core_schema
 except ImportError as import_error:
     error = import_error
 
     # noinspection PyUnusedLocal
-    def _get_pydantic_core_schema(cls, source_type: Any, handler: Any):
+    def _get_pydantic_core_schema(
+        cls, source_type: Any, handler: "GetCoreSchemaHandler"
+    ):
         raise NotImplementedError(
             f"pydantic must be installed for "
             f"{_get_pydantic_core_schema.__name__} to work."
         ) from error
 else:
     # noinspection PyUnusedLocal
-    def _get_pydantic_core_schema(
-        cls, source_type: Any, handler: Any
+    # Mypy complains: "All conditional function variants must have identical signatures".
+    # In this case, it doesn't matter and can be ignored.
+    def _get_pydantic_core_schema(  # type: ignore
+        cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
         from_string_validator = core_schema.no_info_plain_validator_function(cls)
         python_schema = core_schema.union_schema(
@@ -64,7 +71,7 @@ class ProperPath(Path):
 
         path1 = ProperPath("~/Downloads")
         repr(path1)
-        # Prints: ProperPath(path=/Users/culdesac/Downloads, actual=('~/Downloads',),
+        # Prints: ProperPath(path=/Users/culdesac/Downloads, actual=('~/Downloads', ),
         kind=dir, exists=True, err_logger=<RootLogger root (WARNING)>)
         ```
 
@@ -116,7 +123,7 @@ class ProperPath(Path):
         opinion: bool = True,
         ensure_exists: bool = False,
         follow_unix: bool = False,
-    ) -> ProperPlatformDirs:
+    ) -> ProperPlatformDirs | ProperUnix:
         """
         Initializes and returns a `platformdirs.PlatformDirs` instance.
 
@@ -133,7 +140,7 @@ class ProperPath(Path):
 
 
         Example:
-            ```python  hl_lines="3 8 13"
+            ```python hl_lines="3 8 13"
             app_dirs = ProperPath.platformdirs("MyApp", "MyOrg")
             app_dirs.user_data_dir
             # Returns ProperPath('/Users/user/Library/Application Support/MyApp')
@@ -259,7 +266,9 @@ class ProperPath(Path):
         return instance
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any):
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: "GetCoreSchemaHandler"
+    ) -> "core_schema.CoreSchema":
         """
         Enables Pydantic validation support.
         See [Pydantic documentation](https://docs.pydantic.dev/latest/concepts/types/#customizing-validation-with-__get_pydantic_core_schema__).
@@ -276,7 +285,7 @@ class ProperPath(Path):
     def actual(self) -> Iterable[str]:
         """
         Provides access to the user-given path (or path segments) that was passed to the constructor of the
-        `ProperPath` instance. `ProperPath` by default expands any user indicator `"~"`
+        `ProperPath` instance. `ProperPath`, by default, expands any user indicator `"~"`
         automatically and uses the expanded path for all operations. The `actual` attribute will reveal
         the non-expanded original value.
 
@@ -642,7 +651,7 @@ class ProperPath(Path):
     ) -> Optional[str]:
         """
         `get_text` method is basically [`read_text`](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.read_text)
-        with support for extra `defaults` parameter. `get_text` passes optional arguments `encoding`, `errors`, `newline` to
+        with support for an extra `default` parameter. `get_text` passes optional arguments `encoding`, `errors`, `newline` to
         `read_text`.
 
         Args:
@@ -665,7 +674,7 @@ class ProperPath(Path):
             ```
 
         Returns:
-            The decoded contents of the pointed-to file as a string or default (when file does not exist).
+            The decoded contents of the pointed-to file as a string or default (when the file does not exist).
         """
         try:
             if sys.version_info.minor >= 13:
@@ -678,14 +687,14 @@ class ProperPath(Path):
     def get_bytes(self, default: Optional[bytes] = None) -> Optional[bytes]:
         """
         `get_bytes` method is basically [`read_bytes`](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.read_bytes)
-        with support for extra `defaults` parameter.
+        with support for an extra `default` parameter.
 
         Args:
             default:
                 If the file does not exist, then `default` is returned. By default, `default` is `None`.
 
         Returns:
-            The binary contents of the pointed-to file as a bytes object or default (when file does not exist).
+            The binary contents of the pointed-to file as "bytes" object or default (when the file does not exist).
         """
         try:
             return super().read_bytes()
