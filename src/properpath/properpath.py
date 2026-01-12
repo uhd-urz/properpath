@@ -561,9 +561,9 @@ class ProperPath(Path):
     def remove(self, parent_only: bool = False, verbose: bool = True) -> None:
         """
         Removes the `ProperPath` file or directory based on the specified parameters. The method
-        removes either all contents of a directory path or a single file, depending on the type of
-        the path (file or directory). If `parent_only` is True, only top-level contents are removed
-        while keeping the parent directory intact. If `parent_only` is False, all contents are
+        removes either only parent contents or everything recursively depending on the type of
+        the path (file or directory). If `parent_only` is True, only top-level files are removed and top-level
+        directories are left as is. If `parent_only` is False, all files, directories, sub-directories are
         removed recursively. `verbose` can be passed `False` (default is `True`) to disable logging
         the removals.
 
