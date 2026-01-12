@@ -1,13 +1,13 @@
 [project]
 name = "properpath"
-version = "0.2.9"
+version = "0.2.10"
 authors = [{ name = "Alexander Haller, Mahadi Xion", email = "elabftw@uni-heidelberg.de" }]
 maintainers = [{ name = "Mahadi Xion", email = "mahadi.xion@urz.uni-heidelberg.de" }]
 readme = "README.md"
 description = "A pathlib.Path drop-in replacement with extra features. "
 requires-python = ">=3.12"
 dependencies = [
-    "platformdirs>=4.4.0,<4.6.0",
+    "platformdirs>=4.5.1,<4.6.0",
 ]
 license = "MIT"
 keywords = [

@@ -76,6 +76,40 @@ class _PlatformDirsGetAttrPatcher:
 class ProperPlatformDirs(  # type: ignore
     _PlatformDirsGetAttrPatcher, PlatformDirs, PlatformDirsCommonAttrs
 ):
+    # The following dirty attribute hack is only necessary for mypy to get
+    # the "ProperPath" type instead of the platformdirs "str" for the end-user
+    site_cache_dir: "ProperPath"  # type: ignore
+    site_cache_path: "ProperPath"  # type: ignore
+    site_config_dir: "ProperPath"  # type: ignore
+    site_config_path: "ProperPath"  # type: ignore
+    site_data_dir: "ProperPath"  # type: ignore
+    site_data_path: "ProperPath"  # type: ignore
+    site_runtime_dir: "ProperPath"  # type: ignore
+    site_runtime_path: "ProperPath"  # type: ignore
+    user_cache_dir: "ProperPath"  # type: ignore
+    user_cache_path: "ProperPath"  # type: ignore
+    user_config_dir: "ProperPath"  # type: ignore
+    user_config_path: "ProperPath"  # type: ignore
+    user_data_dir: "ProperPath"  # type: ignore
+    user_data_path: "ProperPath"  # type: ignore
+    user_desktop_dir: "ProperPath"  # type: ignore
+    user_desktop_path: "ProperPath"  # type: ignore
+    user_documents_dir: "ProperPath"  # type: ignore
+    user_documents_path: "ProperPath"  # type: ignore
+    user_downloads_dir: "ProperPath"  # type: ignore
+    user_downloads_path: "ProperPath"  # type: ignore
+    user_log_dir: "ProperPath"  # type: ignore
+    user_log_path: "ProperPath"  # type: ignore
+    user_music_dir: "ProperPath"  # type: ignore
+    user_music_path: "ProperPath"  # type: ignore
+    user_pictures_dir: "ProperPath"  # type: ignore
+    user_pictures_path: "ProperPath"  # type: ignore
+    user_runtime_dir: "ProperPath"  # type: ignore
+    user_runtime_path: "ProperPath"  # type: ignore
+    user_state_dir: "ProperPath"  # type: ignore
+    user_state_path: "ProperPath"  # type: ignore
+    user_videos_dir: "ProperPath"  # type: ignore
+
     def __init__(self, *args, path_cls: type[Path], **kwargs):
         super().__init__(path_cls=path_cls)
         super(PlatformDirs, self).__init__(*args, **kwargs)
@@ -85,6 +119,40 @@ class ProperPlatformDirs(  # type: ignore
 
 
 class ProperUnix(_PlatformDirsGetAttrPatcher, Unix, PlatformDirsCommonAttrs):  # type: ignore
+    # The following dirty attribute hack is only necessary for mypy to get
+    # the "ProperPath" type instead of the platformdirs "str" for the end-user
+    site_cache_dir: "ProperPath"  # type: ignore
+    site_cache_path: "ProperPath"  # type: ignore
+    site_config_dir: "ProperPath"  # type: ignore
+    site_config_path: "ProperPath"  # type: ignore
+    site_data_dir: "ProperPath"  # type: ignore
+    site_data_path: "ProperPath"  # type: ignore
+    site_runtime_dir: "ProperPath"  # type: ignore
+    site_runtime_path: "ProperPath"  # type: ignore
+    user_cache_dir: "ProperPath"  # type: ignore
+    user_cache_path: "ProperPath"  # type: ignore
+    user_config_dir: "ProperPath"  # type: ignore
+    user_config_path: "ProperPath"  # type: ignore
+    user_data_dir: "ProperPath"  # type: ignore
+    user_data_path: "ProperPath"  # type: ignore
+    user_desktop_dir: "ProperPath"  # type: ignore
+    user_desktop_path: "ProperPath"  # type: ignore
+    user_documents_dir: "ProperPath"  # type: ignore
+    user_documents_path: "ProperPath"  # type: ignore
+    user_downloads_dir: "ProperPath"  # type: ignore
+    user_downloads_path: "ProperPath"  # type: ignore
+    user_log_dir: "ProperPath"  # type: ignore
+    user_log_path: "ProperPath"  # type: ignore
+    user_music_dir: "ProperPath"  # type: ignore
+    user_music_path: "ProperPath"  # type: ignore
+    user_pictures_dir: "ProperPath"  # type: ignore
+    user_pictures_path: "ProperPath"  # type: ignore
+    user_runtime_dir: "ProperPath"  # type: ignore
+    user_runtime_path: "ProperPath"  # type: ignore
+    user_state_dir: "ProperPath"  # type: ignore
+    user_state_path: "ProperPath"  # type: ignore
+    user_videos_dir: "ProperPath"  # type: ignore
+
     def __init__(self, *args, path_cls: type[Path], **kwargs):
         super().__init__(path_cls=path_cls)
         super(Unix, self).__init__(*args, **kwargs)
@@ -94,6 +162,40 @@ class ProperUnix(_PlatformDirsGetAttrPatcher, Unix, PlatformDirsCommonAttrs):  #
 
 
 class ProperMacOS(_PlatformDirsGetAttrPatcher, MacOS, PlatformDirsCommonAttrs):  # type: ignore
+    # The following dirty attribute hack is only necessary for mypy to get
+    # the "ProperPath" type instead of the platformdirs "str" for the end-user
+    site_cache_dir: "ProperPath"  # type: ignore
+    site_cache_path: "ProperPath"  # type: ignore
+    site_config_dir: "ProperPath"  # type: ignore
+    site_config_path: "ProperPath"  # type: ignore
+    site_data_dir: "ProperPath"  # type: ignore
+    site_data_path: "ProperPath"  # type: ignore
+    site_runtime_dir: "ProperPath"  # type: ignore
+    site_runtime_path: "ProperPath"  # type: ignore
+    user_cache_dir: "ProperPath"  # type: ignore
+    user_cache_path: "ProperPath"  # type: ignore
+    user_config_dir: "ProperPath"  # type: ignore
+    user_config_path: "ProperPath"  # type: ignore
+    user_data_dir: "ProperPath"  # type: ignore
+    user_data_path: "ProperPath"  # type: ignore
+    user_desktop_dir: "ProperPath"  # type: ignore
+    user_desktop_path: "ProperPath"  # type: ignore
+    user_documents_dir: "ProperPath"  # type: ignore
+    user_documents_path: "ProperPath"  # type: ignore
+    user_downloads_dir: "ProperPath"  # type: ignore
+    user_downloads_path: "ProperPath"  # type: ignore
+    user_log_dir: "ProperPath"  # type: ignore
+    user_log_path: "ProperPath"  # type: ignore
+    user_music_dir: "ProperPath"  # type: ignore
+    user_music_path: "ProperPath"  # type: ignore
+    user_pictures_dir: "ProperPath"  # type: ignore
+    user_pictures_path: "ProperPath"  # type: ignore
+    user_runtime_dir: "ProperPath"  # type: ignore
+    user_runtime_path: "ProperPath"  # type: ignore
+    user_state_dir: "ProperPath"  # type: ignore
+    user_state_path: "ProperPath"  # type: ignore
+    user_videos_dir: "ProperPath"  # type: ignore
+
     def __init__(self, *args, path_cls: type[Path], **kwargs):
         super().__init__(path_cls=path_cls)
         super(MacOS, self).__init__(*args, **kwargs)
@@ -103,6 +205,40 @@ class ProperMacOS(_PlatformDirsGetAttrPatcher, MacOS, PlatformDirsCommonAttrs): 
 
 
 class ProperAndroid(_PlatformDirsGetAttrPatcher, Android, PlatformDirsCommonAttrs):  # type: ignore
+    # The following dirty attribute hack is only necessary for mypy to get
+    # the "ProperPath" type instead of the platformdirs "str" for the end-user
+    site_cache_dir: "ProperPath"       # type: ignore
+    site_cache_path: "ProperPath"  # type: ignore
+    site_config_dir: "ProperPath"  # type: ignore
+    site_config_path: "ProperPath"  # type: ignore
+    site_data_dir: "ProperPath"  # type: ignore
+    site_data_path: "ProperPath"  # type: ignore
+    site_runtime_dir: "ProperPath"  # type: ignore
+    site_runtime_path: "ProperPath"  # type: ignore
+    user_cache_dir: "ProperPath"  # type: ignore
+    user_cache_path: "ProperPath"  # type: ignore
+    user_config_dir: "ProperPath"  # type: ignore
+    user_config_path: "ProperPath"  # type: ignore
+    user_data_dir: "ProperPath"  # type: ignore
+    user_data_path: "ProperPath"  # type: ignore
+    user_desktop_dir: "ProperPath"  # type: ignore
+    user_desktop_path: "ProperPath"  # type: ignore
+    user_documents_dir: "ProperPath"  # type: ignore
+    user_documents_path: "ProperPath"  # type: ignore
+    user_downloads_dir: "ProperPath"  # type: ignore
+    user_downloads_path: "ProperPath"  # type: ignore
+    user_log_dir: "ProperPath"  # type: ignore
+    user_log_path: "ProperPath"  # type: ignore
+    user_music_dir: "ProperPath"  # type: ignore
+    user_music_path: "ProperPath"  # type: ignore
+    user_pictures_dir: "ProperPath"  # type: ignore
+    user_pictures_path: "ProperPath"  # type: ignore
+    user_runtime_dir: "ProperPath"  # type: ignore
+    user_runtime_path: "ProperPath"  # type: ignore
+    user_state_dir: "ProperPath"  # type: ignore
+    user_state_path: "ProperPath"  # type: ignore
+    user_videos_dir: "ProperPath"  # type: ignore
+
     def __init__(self, *args, path_cls: type[Path], **kwargs):
         super().__init__(path_cls=path_cls)
         super(Android, self).__init__(*args, **kwargs)
@@ -112,6 +248,40 @@ class ProperAndroid(_PlatformDirsGetAttrPatcher, Android, PlatformDirsCommonAttr
 
 
 class ProperWindows(_PlatformDirsGetAttrPatcher, Windows, PlatformDirsCommonAttrs):  # type: ignore
+    # The following dirty attribute hack is only necessary for mypy to get
+    # the "ProperPath" type instead of the platformdirs "str" for the end-user
+    site_cache_dir: "ProperPath"               # type: ignore
+    site_cache_path: "ProperPath"  # type: ignore
+    site_config_dir: "ProperPath"  # type: ignore
+    site_config_path: "ProperPath"  # type: ignore
+    site_data_dir: "ProperPath"  # type: ignore
+    site_data_path: "ProperPath"  # type: ignore
+    site_runtime_dir: "ProperPath"  # type: ignore
+    site_runtime_path: "ProperPath"  # type: ignore
+    user_cache_dir: "ProperPath"  # type: ignore
+    user_cache_path: "ProperPath"  # type: ignore
+    user_config_dir: "ProperPath"  # type: ignore
+    user_config_path: "ProperPath"  # type: ignore
+    user_data_dir: "ProperPath"  # type: ignore
+    user_data_path: "ProperPath"  # type: ignore
+    user_desktop_dir: "ProperPath"  # type: ignore
+    user_desktop_path: "ProperPath"  # type: ignore
+    user_documents_dir: "ProperPath"  # type: ignore
+    user_documents_path: "ProperPath"  # type: ignore
+    user_downloads_dir: "ProperPath"  # type: ignore
+    user_downloads_path: "ProperPath"  # type: ignore
+    user_log_dir: "ProperPath"  # type: ignore
+    user_log_path: "ProperPath"  # type: ignore
+    user_music_dir: "ProperPath"  # type: ignore
+    user_music_path: "ProperPath"  # type: ignore
+    user_pictures_dir: "ProperPath"  # type: ignore
+    user_pictures_path: "ProperPath"  # type: ignore
+    user_runtime_dir: "ProperPath"  # type: ignore
+    user_runtime_path: "ProperPath"  # type: ignore
+    user_state_dir: "ProperPath"  # type: ignore
+    user_state_path: "ProperPath"  # type: ignore
+    user_videos_dir: "ProperPath"  # type: ignore
+
     def __init__(self, *args, path_cls: type[Path], **kwargs):
         super().__init__(path_cls=path_cls)
         super(Windows, self).__init__(*args, **kwargs)
