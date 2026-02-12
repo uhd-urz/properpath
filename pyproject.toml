@@ -7,7 +7,7 @@ readme = "README.md"
 description = "A pathlib.Path drop-in replacement with extra features. "
 requires-python = ">=3.12"
 dependencies = [
-    "platformdirs>=4.5.1,<4.6.0",
+    "platformdirs>=4.6.0,<4.7.0",
 ]
 license = "MIT"
 keywords = [
