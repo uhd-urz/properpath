@@ -1,3 +1,4 @@
+import typing
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -6,6 +7,9 @@ from platformdirs.android import Android
 from platformdirs.macos import MacOS
 from platformdirs.unix import Unix
 from platformdirs.windows import Windows
+
+if typing.TYPE_CHECKING:
+    from .properpath import ProperPath
 
 
 @dataclass(frozen=True)

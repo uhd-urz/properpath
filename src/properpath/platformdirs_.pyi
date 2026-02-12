@@ -1,4 +1,5 @@
 import typing
+from pathlib import Path
 
 if typing.TYPE_CHECKING:
     from .properpath import ProperPath
@@ -71,6 +72,8 @@ class ProperPlatformDirs:
     user_state_path: ProperPath
     user_videos_dir: ProperPath
 
+    def __init__(self, *args, path_cls: type[Path], **kwargs) -> None: ...
+
 class ProperUnix:
     site_cache_dir: ProperPath
     site_cache_path: ProperPath
@@ -103,6 +106,8 @@ class ProperUnix:
     user_state_dir: ProperPath
     user_state_path: ProperPath
     user_videos_dir: ProperPath
+
+    def __init__(self, *args, path_cls: type[Path], **kwargs) -> None: ...
 
 class ProperMacOS:
     site_cache_dir: ProperPath
@@ -137,6 +142,8 @@ class ProperMacOS:
     user_state_path: ProperPath
     user_videos_dir: ProperPath
 
+    def __init__(self, *args, path_cls: type[Path], **kwargs) -> None: ...
+
 class ProperAndroid:
     site_cache_dir: ProperPath
     site_cache_path: ProperPath
@@ -170,6 +177,8 @@ class ProperAndroid:
     user_state_path: ProperPath
     user_videos_dir: ProperPath
 
+    def __init__(self, *args, path_cls: type[Path], **kwargs) -> None: ...
+
 class ProperWindows:
     site_cache_dir: ProperPath
     site_cache_path: ProperPath
@@ -202,3 +211,5 @@ class ProperWindows:
     user_state_dir: ProperPath
     user_state_path: ProperPath
     user_videos_dir: ProperPath
+
+    def __init__(self, *args, path_cls: type[Path], **kwargs) -> None: ...

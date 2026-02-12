@@ -563,7 +563,7 @@ class ProperPath(Path):
         Removes the `ProperPath` file or directory based on the specified parameters. The method
         removes either only parent contents or everything recursively depending on the type of
         the path (file or directory). If `parent_only` is True, only top-level files are removed and top-level
-        directories are left as is. If `parent_only` is False, all files, directories, sub-directories are
+        directories are left as is. If `parent_only` is False, all files, directories, subdirectories are
         removed recursively. `verbose` can be passed `False` (default is `True`) to disable logging
         the removals.
 
