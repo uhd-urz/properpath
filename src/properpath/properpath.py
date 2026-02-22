@@ -89,11 +89,11 @@ class ProperPath(Path):
             "._.DS_Store",
             "Icon\r",
             ".localized",
-            ".TemporaryItems/",
-            ".Trashes/",
-            ".Spotlight-V100/",
-            ".fseventsd/",
-            "__MACOSX/",
+            ".TemporaryItems",  # dir
+            ".Trashes",
+            ".Spotlight-V100",  # dir
+            ".fseventsd",  # dir
+            "__MACOSX",  # dir
         },
         PlatformNames.win32.value: {
             "Thumbs.db",
@@ -101,7 +101,7 @@ class ProperPath(Path):
             "desktop.ini",
         },
         PlatformNames.linux.value: {
-            ".Trash-1000/",
+            ".Trash-1000",  # dir
             ".directory",
             ".nomedia",
         },
