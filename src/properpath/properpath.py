@@ -87,7 +87,7 @@ class ProperPath(Path):
         PlatformNames.darwin.value: {
             ".DS_Store",
             "._.DS_Store",
-            "Icon?",
+            "Icon\r",
             ".localized",
             ".TemporaryItems/",
             ".Trashes/",
@@ -682,9 +682,9 @@ class ProperPath(Path):
         Args:
             encoding: The same meaning as the `encoding` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
-            errors: The same meaning as the `encoding` argument for method
+            errors: The same meaning as the `errors` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
-            newline: The same meaning as the `encoding` argument for method
+            newline: The same meaning as the `newline` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
                 `newline` is only supported in Python 3.13 and above.
             default:
@@ -731,6 +731,7 @@ class ProperPath(Path):
         verbose: bool = True,
         *,
         all_platforms: bool = False,
+        errors: Literal["strict", "ignore"] = "strict",
     ) -> None:
         """
         remove_platform_metadata method **recursively** removes the host machine's platform-specific metadata
@@ -742,25 +743,46 @@ class ProperPath(Path):
                 should be printed or logged. Defaults to `True`.
             all_platforms: When `all_platforms` is True, the host machine's specific platform is ignored and
                 all metadata files defined in `metadata_file_by_platforms` are removed.
+            errors: When attempting to remove a metadata file results in an exception, by default (`errors == "strict"`),
+                that exception will be raised. This exception, like all other exceptions, will be tied to the problematic
+                `ProperPath` instance only and can be caught with `p.PathException`. If `errors == "ignore"`, then
+                all exceptions will be silently ignored.
 
         Returns:
-
+            `None`
         """
+
+        def _remove_metadata(path: Self) -> None:
+            try:
+                path.remove(verbose=verbose)
+            except path.PathException:
+                match errors:
+                    case "strict":
+                        raise
+                    case "ignore":
+                        ...
+                    case _:
+                        raise ValueError(
+                            f"Invalid value '{errors}' for parameter 'errors'. "
+                            "The following values for 'errors' are allowed: "
+                            "strict, ignore."
+                        )
+
         sys_platform: str = "all" if all_platforms else sys.platform
         match sys_platform:
             case "all":
-                for f in self._expanded.rglob(".*"):
-                    if f.name in itertools.chain.from_iterable(
-                        self.__class__.metadata_file_by_platforms
+                for p in self.rglob("*"):
+                    if p.name in itertools.chain.from_iterable(
+                        self.__class__.metadata_file_by_platforms.values()
                     ):
-                        ProperPath(f).remove(verbose=verbose)
+                        _remove_metadata(p)
             case PlatformNames.darwin | PlatformNames.win32 | PlatformNames.linux:
-                for f in self._expanded.rglob(".*"):
+                for p in self.rglob("*"):
                     if (
-                        f.name
+                        p.name
                         in self.__class__.metadata_file_by_platforms[sys_platform]
                     ):
-                        ProperPath(f).remove(verbose=verbose)
+                        _remove_metadata(p)
             case _:
                 raise ValueError(
                     f"Platform '{sys_platform}' is unsupported for removing metadata files. "
