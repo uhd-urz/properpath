@@ -1,3 +1,4 @@
+import itertools
 import logging
 import sys
 from copy import deepcopy
@@ -6,6 +7,7 @@ from shutil import rmtree
 from typing import Any, Iterable, Literal, Optional, Self, Union
 
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
+from .utils import PlatformNames
 
 try:
     # noinspection PyUnusedImports
@@ -81,6 +83,29 @@ class ProperPath(Path):
     """
 
     default_err_logger: logging.Logger = logging.getLogger()
+    metadata_file_by_platforms: dict[str, set[str]] = {
+        PlatformNames.darwin.value: {
+            ".DS_Store",
+            "._.DS_Store",
+            "Icon\r",
+            ".localized",
+            ".TemporaryItems",  # dir
+            ".Trashes",
+            ".Spotlight-V100",  # dir
+            ".fseventsd",  # dir
+            "__MACOSX",  # dir
+        },
+        PlatformNames.win32.value: {
+            "Thumbs.db",
+            "ehthumbs.db",
+            "desktop.ini",
+        },
+        PlatformNames.linux.value: {
+            ".Trash-1000",  # dir
+            ".directory",
+            ".nomedia",
+        },
+    }
 
     def __init__(
         self,
@@ -181,7 +206,7 @@ class ProperPath(Path):
 
         dirs: ProperPlatformDirs | ProperUnix
         if follow_unix is True:
-            if sys.platform == "darwin":
+            if sys.platform == PlatformNames.darwin:
                 dirs = ProperUnix(
                     appname,
                     appauthor,
@@ -657,9 +682,9 @@ class ProperPath(Path):
         Args:
             encoding: The same meaning as the `encoding` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
-            errors: The same meaning as the `encoding` argument for method
+            errors: The same meaning as the `errors` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
-            newline: The same meaning as the `encoding` argument for method
+            newline: The same meaning as the `newline` argument for method
                 [`open`](https://docs.python.org/3.13/library/functions.html#open).
                 `newline` is only supported in Python 3.13 and above.
             default:
@@ -700,6 +725,70 @@ class ProperPath(Path):
             return super().read_bytes()
         except FileNotFoundError:
             return default
+
+    def remove_platform_metadata(
+        self,
+        verbose: bool = True,
+        *,
+        all_platforms: bool = False,
+        errors: Literal["strict", "ignore"] = "strict",
+    ) -> None:
+        """
+        remove_platform_metadata method **recursively** removes the host machine's platform-specific metadata
+        files like `.DS_Store` on macOS, `Thumbs.db` on Windows, and `.Trash-1000` folder on Linux. The class
+        attribute `metadata_file_by_platforms` stores the platform-specific metadata file names.
+
+        Args:
+            verbose: A boolean flag indicating whether detailed logs of the removal operations
+                should be printed or logged. Defaults to `True`.
+            all_platforms: When `all_platforms` is True, the host machine's specific platform is ignored and
+                all metadata files defined in `metadata_file_by_platforms` are removed.
+            errors: When attempting to remove a metadata file results in an exception, by default (`errors == "strict"`),
+                that exception will be raised. This exception, like all other exceptions, will be tied to the problematic
+                `ProperPath` instance only and can be caught with `p.PathException`. If `errors == "ignore"`, then
+                all exceptions will be silently ignored.
+
+        Returns:
+            `None`
+        """
+
+        def _remove_metadata(path: Self) -> None:
+            try:
+                path.remove(verbose=verbose)
+            except path.PathException:
+                match errors:
+                    case "strict":
+                        raise
+                    case "ignore":
+                        ...
+                    case _:
+                        raise ValueError(
+                            f"Invalid value '{errors}' for parameter 'errors'. "
+                            "The following values for 'errors' are allowed: "
+                            "strict, ignore."
+                        )
+
+        sys_platform: str = "all" if all_platforms else sys.platform
+        match sys_platform:
+            case "all":
+                for p in self.rglob("*"):
+                    if p.name in itertools.chain.from_iterable(
+                        self.__class__.metadata_file_by_platforms.values()
+                    ):
+                        _remove_metadata(p)
+            case PlatformNames.darwin | PlatformNames.win32 | PlatformNames.linux:
+                for p in self.rglob("*"):
+                    if (
+                        p.name
+                        in self.__class__.metadata_file_by_platforms[sys_platform]
+                    ):
+                        _remove_metadata(p)
+            case _:
+                raise ValueError(
+                    f"Platform '{sys_platform}' is unsupported for removing metadata files. "
+                    f"Supported platforms are: "
+                    f"{self.__class__.metadata_file_by_platforms.keys()}"
+                )
 
 
 P = ProperPath
