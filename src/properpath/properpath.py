@@ -1,3 +1,4 @@
+import itertools
 import logging
 import sys
 from copy import deepcopy
@@ -6,6 +7,7 @@ from shutil import rmtree
 from typing import Any, Iterable, Literal, Optional, Self, Union
 
 from .platformdirs_ import ProperPlatformDirs, ProperUnix
+from .utils import PlatformNames
 
 try:
     # noinspection PyUnusedImports
@@ -81,6 +83,29 @@ class ProperPath(Path):
     """
 
     default_err_logger: logging.Logger = logging.getLogger()
+    metadata_file_by_platforms: dict[str, set[str]] = {
+        PlatformNames.darwin.value: {
+            ".DS_Store",
+            "._.DS_Store",
+            "Icon?",
+            ".localized",
+            ".TemporaryItems/",
+            ".Trashes/",
+            ".Spotlight-V100/",
+            ".fseventsd/",
+            "__MACOSX/",
+        },
+        PlatformNames.win32.value: {
+            "Thumbs.db",
+            "ehthumbs.db",
+            "desktop.ini",
+        },
+        PlatformNames.linux.value: {
+            ".Trash-1000/",
+            ".directory",
+            ".nomedia",
+        },
+    }
 
     def __init__(
         self,
@@ -181,7 +206,7 @@ class ProperPath(Path):
 
         dirs: ProperPlatformDirs | ProperUnix
         if follow_unix is True:
-            if sys.platform == "darwin":
+            if sys.platform == PlatformNames.darwin:
                 dirs = ProperUnix(
                     appname,
                     appauthor,
@@ -700,6 +725,48 @@ class ProperPath(Path):
             return super().read_bytes()
         except FileNotFoundError:
             return default
+
+    def remove_platform_metadata(
+        self,
+        verbose: bool = True,
+        *,
+        all_platforms: bool = False,
+    ) -> None:
+        """
+        remove_platform_metadata method **recursively** removes the host machine's platform-specific metadata
+        files like `.DS_Store` on macOS, `Thumbs.db` on Windows, and `.Trash-1000` folder on Linux. The class
+        attribute `metadata_file_by_platforms` stores the platform-specific metadata file names.
+
+        Args:
+            verbose: A boolean flag indicating whether detailed logs of the removal operations
+                should be printed or logged. Defaults to `True`.
+            all_platforms: When `all_platforms` is True, the host machine's specific platform is ignored and
+                all metadata files defined in `metadata_file_by_platforms` are removed.
+
+        Returns:
+
+        """
+        sys_platform: str = "all" if all_platforms else sys.platform
+        match sys_platform:
+            case "all":
+                for f in self._expanded.rglob(".*"):
+                    if f.name in itertools.chain.from_iterable(
+                        self.__class__.metadata_file_by_platforms
+                    ):
+                        ProperPath(f).remove(verbose=verbose)
+            case PlatformNames.darwin | PlatformNames.win32 | PlatformNames.linux:
+                for f in self._expanded.rglob(".*"):
+                    if (
+                        f.name
+                        in self.__class__.metadata_file_by_platforms[sys_platform]
+                    ):
+                        ProperPath(f).remove(verbose=verbose)
+            case _:
+                raise ValueError(
+                    f"Platform '{sys_platform}' is unsupported for removing metadata files. "
+                    f"Supported platforms are: "
+                    f"{self.__class__.metadata_file_by_platforms.keys()}"
+                )
 
 
 P = ProperPath
